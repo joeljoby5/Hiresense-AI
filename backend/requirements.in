@@ -1,0 +1,8 @@
+# Direct runtime and test dependencies; requirements.txt pins the full resolution.
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+python-dotenv
+pytest
+httpx

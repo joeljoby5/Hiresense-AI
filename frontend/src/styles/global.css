@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #17283e;
+  --color-teal: #197e76;
+  --color-slate: #64748b;
+  --color-canvas: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-ink: #0f172a;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+:root { font-family: var(--font-sans); color: var(--color-ink); background: var(--color-canvas); font-synthesis: none; text-rendering: optimizeLegibility; }
+body { margin: 0; min-width: 320px; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--color-teal); outline-offset: 5px; }
+.site-header, .site-footer { max-width: 1240px; margin: auto; padding: 28px 48px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.site-header { border-bottom: 1px solid var(--color-border); }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--color-navy); text-decoration: none; font-size: 1.25rem; font-weight: 750; letter-spacing: -.04em; }
+.brand-mark { background: var(--color-navy); color: white; border-radius: 9px; width: 38px; height: 38px; display: grid; place-content: center; position: relative; font-size: 1.5rem; }
+.brand-mark span { position: absolute; color: #65d1bc; right: 5px; bottom: 3px; }
+.stage-badge { font-size: .875rem; font-weight: 600; color: var(--color-navy); background: #edf2f6; border: 1px solid var(--color-border); padding: 7px 12px; border-radius: 6px; }
+.page-content { max-width: 1240px; margin: auto; padding: 88px 48px 100px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 80px; align-items: center; }
+.eyebrow { font-size: .875rem; font-weight: 650; letter-spacing: .045em; }
+h1 { color: var(--color-navy); font-size: clamp(2.6rem, 4.8vw, 4rem); line-height: 1.1; font-weight: 750; letter-spacing: -.045em; margin: 22px 0 28px; }
+.project-title { font-size: 1.125rem; font-weight: 600; line-height: 1.6; margin: 0 0 14px; }
+.description { color: #526278; line-height: 1.8; margin: 0; }
+.scope-note { display: flex; gap: 16px; margin-top: 36px; color: #526278; font-size: .875rem; line-height: 1.7; }
+.scope-note strong { color: var(--color-navy); font-weight: 600; }
+.scope-line { flex: 0 0 3px; background: var(--color-border); border-radius: 2px; }
+.scope-note p { margin: 0; }
+.connection-panel { background: white; border: 1px solid var(--color-border); border-radius: 14px; padding: 30px; box-shadow: 0 8px 30px #17283e05; }
+.panel-heading { border-bottom: 1px solid var(--color-border); padding-bottom: 24px; margin-bottom: 28px; }
+.panel-heading h2 { font-size: 1.125rem; font-weight: 650; margin: 0 0 8px; }
+.panel-heading .eyebrow { color: var(--color-slate); font-weight: 400; letter-spacing: 0; }
+.connection-label { display: flex; align-items: center; gap: 10px; font-weight: 650; line-height: 1.6; }
+.connection-panel .text-slate { font-size: .9375rem; line-height: 1.7; margin: 12px 0 24px; }
+.status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--color-slate); flex-shrink: 0; }
+.connected { color: var(--color-teal); }
+.connected .status-dot { background: var(--color-teal); }
+.unavailable, .invalid { color: #9a3412; }
+.unavailable .status-dot, .invalid .status-dot { background: #9a3412; }
+.metadata { margin: 0 0 24px; }
+.metadata div { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-bottom: 1px solid #f1f5f9; font-size: .875rem; }
+.metadata dt { color: #526278; }
+.metadata dd { margin: 0; font-weight: 550; overflow-wrap: anywhere; text-align: right; }
+.retry-button { width: 100%; background: var(--color-navy); color: white; padding: 12px 18px; min-height: 46px; border-radius: 7px; border: 0; cursor: pointer; font-weight: 600; font-size: .9375rem; }
+.retry-button:hover:enabled { background: #243d5b; }
+.retry-button:disabled { opacity: .65; cursor: wait; }
+.site-footer { border-top: 1px solid var(--color-border); color: var(--color-slate); font-size: .875rem; }
+@media (max-width: 900px) { .page-content { gap: 36px; padding: 60px 32px; } .site-header, .site-footer { padding: 24px 32px; } }
+@media (max-width: 700px) { .page-content { grid-template-columns: 1fr; padding: 44px 24px 56px; gap: 36px; } .site-header, .site-footer { padding: 22px 24px; flex-wrap: wrap; } .stage-badge { font-size: .8125rem; } .connection-panel { padding: 24px; } .site-footer { gap: 8px; } }
