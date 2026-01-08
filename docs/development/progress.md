@@ -1,56 +1,40 @@
 # Development progress
 
-Updated: 2026-11-26 (Asia/Calcutta).
+Updated: 2026-11-27 (Asia/Calcutta).
 
 ## Current milestone
 
-Task 001 — project foundation, development environment and initial architecture. Implementation and supported checks complete. Browser verification remains unverified.
+Task 002: canonical resume domain, SQLite/SQLAlchemy persistence, repositories and Alembic migrations. Implementation and supported checks complete. Scope stops before Task 003.
 
-## Completed
+## Completed foundation
 
-- Inspected the initially empty workspace, ancestor instructions, Git state, installed runtimes and preferred ports before implementation.
-- Initialized one root Git repository; no commits, remotes, pushes or nested repositories.
-- Created a backend-local virtual environment, pinned Python dependency resolution, and exact npm dependencies with lockfile.
-- Added application factory, validated environment settings, lifecycle logging, explicit CORS, typed versioned health route and OpenAPI docs.
-- Added a responsive foundation screen, design tokens, configurable API client and development proxy, real connection states, five-second timeout and retry.
-- Added environment examples, root ignore rules, agent instructions, architecture, setup and implementation documentation.
+Task 001's React/TypeScript/Vite/Tailwind presentation, FastAPI application factory, settings, explicit CORS, health contract and frontend health client are preserved. Its historical results remain in [Task 001 report](task-001-report.md). The clean baseline was rechecked: 10 existing backend tests passed before changes.
+
+Task 002 adds typed schema-v1 resume content with stable UUIDs, partial dates, extended/custom sections, section visibility/order and bounded presentation metadata. Internal repositories persist revalidated JSON with owner-aware access, atomic expected-revision updates and explicitly created independent snapshots. SQLAlchemy manages three relational entities, UTC timestamps, foreign keys and caller-owned transactions. Alembic initialization is explicit; startup never creates tables. Readiness is separate from existing liveness.
 
 ## Actual validation
 
 | Check | Result |
 | --- | --- |
-| Backend pytest | **Passed:** 10 tests, 1.09 seconds; one upstream Starlette HTTPX deprecation warning |
-| Python dependency consistency | **Passed:** `pip check` reports no broken requirements |
-| TypeScript | **Passed:** `npm.cmd run typecheck` |
-| ESLint | **Passed:** `npm.cmd run lint`, zero warnings |
-| Production build | **Passed:** Vite 8.4.0; 19 modules; 224.20 kB JS / 70.24 kB gzip; 8.03 kB CSS / 2.57 kB gzip |
-| npm installation audit | **Passed:** zero reported vulnerabilities at installation; not a comprehensive security audit |
-| Backend startup | **Passed:** Uvicorn loopback port 8000 |
-| Frontend startup | **Passed:** Vite loopback port 5173 |
-| Live integration | **Passed:** actual frontend service → Vite proxy → FastAPI; expected configured health response |
-| Live frontend/docs/schema | **Passed:** HTML, `/docs`, `/openapi.json` HTTP 200 |
-| Backend unavailable | **Passed:** stopped owned backend; actual service rejected proxy error as unavailable |
-| Invalid responses | **Passed:** temporary local HTTP fixture returned incomplete schema, malformed JSON and HTML; actual service rejected each as invalid |
-| Bounded timeout | **Passed:** nonresponding local fixture rejected after five seconds |
-| Reconnection after restart | **Passed:** actual service/proxy health check restored after restarting backend |
-| Server teardown | **Passed:** both owned development server sessions stopped after checks |
-| Browser UI / visual / mobile / assistive technology | **Unverified:** no browser-level testing performed |
-| Git ignores and topology | **Passed:** generated artifacts and local environment/database paths ignored, examples and locks visible; only root `.git` |
+| Baseline backend | 10 passed, one existing Starlette/HTTPX deprecation warning |
+| Final backend | **63 passed**, 10.86s; 35 domain, 18 persistence/migration/readiness, 10 original regression cases |
+| Concurrency | Two separate SQLite connections: one stale revision rejected; snapshot numbers 1 and 2 allocated distinctly |
+| Migrations | Fresh temporary upgrade, inspected constraints/indexes, downgrade, re-upgrade and metadata comparison passed |
+| Development database | Explicit upgrade to 0001_resume_foundation; current/check work from repository root and backend/; no drift |
+| Readiness | Automated 200/503 states, missing schema and unavailable file; live initialized database returned ready/200 |
+| Logging privacy | Echo on/off with inherited DEBUG: synthetic private value absent from captured logs |
+| Dependency consistency | pip check passed; unrelated packages unchanged |
+| Frontend | TypeScript, ESLint and production build passed; no frontend source/configuration edits |
+| Live integration | Actual frontend TypeScript health client through Vite proxy to Uvicorn passed; HTML/docs/OpenAPI HTTP 200 |
+| Git ignores | Database, WAL/SHM and journal files ignored; migration source visible; no tracked databases |
+| Syntax/whitespace | compileall and git diff --check passed |
+| Temporary servers | Task-owned ports 8012/5182 stopped; existing 8000/5173 processes left running |
+| Browser UI / PostgreSQL | Unverified; no browser or PostgreSQL tests performed |
 
-Connectivity experiments used an ignored `.local/verify-health.mjs` Node harness that transpiled the actual TypeScript service with its API base pointed at the real Vite proxy. These are service/HTTP integration checks, not rendered React interaction tests. Invalid fixtures were temporary and never shipped as application functionality. Final reconnection verification and server teardown are recorded in the Task 001 report.
+Default SQLite database: `backend/.local/data/hiresense.sqlite3`, ignored and initialized without personal data or development owner seeding. Disposable test databases alone were downgraded. Sandbox installation/temporary-directory restrictions required scoped elevated execution; ordinary project commands are documented in README.
 
-## Decisions and resolved setup issues
+## Limitations and handoff
 
-- Keep routing/settings/schemas separate; defer application/domain/data/AI layers until functionality needs them.
-- Prefix backend environment variables with `HIRESENSE_`: the host's unrelated `DEBUG=release` caused the initial test collection failure. Fixed with namespaced settings and a passing regression test.
-- Vite 8 and Tailwind 4 use the official Vite plugin integration; no legacy Tailwind configuration is required.
-- Use current supported ESLint 10 after npm deprecated the initial ESLint 9 selection.
-- `requirements.in` records direct dependency intent; `requirements.txt` pins every resolved runtime/test dependency. npm uses exact direct versions plus its lockfile.
-- No root `.env.example`: separate backend/frontend examples avoid duplicated configuration.
-- Sandbox restrictions required scoped elevated execution for registry access, virtual environment setup and pytest temporary files. No system runtime, PATH, execution policy or global package changes.
+One existing upstream Starlette HTTPX deprecation warning remains. No authentication, public resume APIs, editor, rendering, ATS or AI functionality is implemented. Snapshot immutability is an application/ordinary ORM boundary; trusted SQL can bypass it. SQLite remains a single-writer database; short transactions and future safe whole-transaction retries may be needed under load. The application does not encrypt the database file. Browser rendering/accessibility and PostgreSQL remain unverified.
 
-## Incomplete, limitations and next milestone
-
-Browser verification is outstanding. Starlette currently warns that HTTPX TestClient support will migrate to HTTPX2; HTTPX is retained as required by this task and all tests pass. Connectivity is checked on page mount and retry, not continuously. Vite's API proxy is development-only. Production readiness, deployment, automated browser tests and frontend unit test frameworks are deferred.
-
-No essential runtime blocker remains. No database, canonical resume schema, authentication, document functionality, ATS, AI or analytics is implemented. Next separately authorized milestone: canonical resume domain model, SQLite foundation, SQLAlchemy and Alembic. Do not begin it automatically.
+See [Task 002 report](task-002-report.md), [canonical schema](../architecture/canonical-resume.md), [persistence](../architecture/persistence.md) and [ADR 002](../architecture/decisions/002-resume-persistence.md). Next separately assigned milestone: Task 003, resume management application services and REST endpoints. No commit, push or deployment was performed.

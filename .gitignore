@@ -25,3 +25,11 @@ Thumbs.db
 .idea/
 .vscode/
 .local/
+
+# SQLite transient files
+*.db-*
+*.sqlite-*
+*.sqlite3-*
+*.db-journal
+*.sqlite-journal
+*.sqlite3-journal

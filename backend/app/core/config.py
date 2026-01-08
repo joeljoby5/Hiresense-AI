@@ -4,6 +4,9 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="HIRESENSE_",
@@ -15,6 +18,8 @@ class Settings(BaseSettings):
     app_name: str = Field(default="HireSense AI", min_length=1)
     app_version: str = Field(default="0.1.0", min_length=1)
     environment: str = Field(default="development", min_length=1)
+    database_url: str = "sqlite:///" + (BACKEND_ROOT / ".local/data/hiresense.sqlite3").as_posix()
+    database_echo: bool = False
     debug: bool = False
     api_prefix: str = "/api/v1"
     allowed_origins: list[str] = [
