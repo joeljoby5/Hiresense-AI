@@ -28,6 +28,8 @@ Every list entry, bullet, link, coursework item and custom section gets a UUID o
 
 ## Validation
 
+Task 003 adds an outer maximum of 200 items to every canonical collection, including nested lists, and 10,000 characters to all canonical strings in addition to existing narrower field constraints. The HTTP layer also rejects bodies over 1 MiB before JSON parsing. These are validation bounds, not a JSON/schema migration; prior oversized stored documents fail reconstruction safely and require explicit correction. Existing content is never silently truncated or rewritten.
+
 PartialDate stores an explicit year and optional month, never an invented day/month. Years are integers 1-9999 and months 1-12. A range fails only when it is provably reversed: the earliest possible start must not follow the latest possible end. Same-year ranges with missing month remain valid. Ongoing entries cannot have actual end dates. Education may have expected graduation while ongoing, but cannot simultaneously have actual end and expected graduation. Certification issue/expiry dates use the same ordering rule.
 
 AcademicScore stores value, system and optional scale as separate strings: GPA, CGPA, percentages and descriptive grades are not converted. Empty skill names fail; spelling and case are retained, with outer whitespace trimmed consistently. Email validation uses email-validator through Pydantic, without deliverability/network checks. URLs accept HTTP(S) only. Phone validation is length bounded, without country-specific formatting assumptions.

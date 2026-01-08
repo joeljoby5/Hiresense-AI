@@ -8,7 +8,7 @@ from app import models  # register metadata
 router = APIRouter()
 INITIAL_REVISION = "0001_resume_foundation"
 
-@router.get("/ready", tags=["Health"], responses={503: {"description": "Database unavailable"}})
+@router.get("/ready", tags=["System"], responses={503: {"description": "Database unavailable"}})
 def get_readiness(request: Request) -> JSONResponse:
     ready = False
     try:

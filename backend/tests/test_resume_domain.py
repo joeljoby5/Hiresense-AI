@@ -114,3 +114,13 @@ def test_mutated_document_revalidated_before_storage():
     doc.section_order.append("unknown")
     with pytest.raises(ValidationError):
         serialize_document(doc)
+
+
+@pytest.mark.parametrize("payload", [
+    {"experience": [{"bullets": [{"text": "Synthetic"}] * 201}]},
+    {"personal_information": {"links": [{"url": "https://example.org"}] * 201}},
+    {"language": "x" * 10001},
+])
+def test_document_outer_resource_bounds(payload):
+    with pytest.raises(ValidationError):
+        ResumeDocument.model_validate(payload)

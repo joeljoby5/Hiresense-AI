@@ -4,37 +4,40 @@ Updated: 2026-11-27 (Asia/Calcutta).
 
 ## Current milestone
 
-Task 002: canonical resume domain, SQLite/SQLAlchemy persistence, repositories and Alembic migrations. Implementation and supported checks complete. Scope stops before Task 003.
+Task 003: resume management application services, REST API and explicit checkpoints. Implementation and supported verification complete. Scope stops before Task 004.
 
-## Completed foundation
+## Implemented
 
-Task 001's React/TypeScript/Vite/Tailwind presentation, FastAPI application factory, settings, explicit CORS, health contract and frontend health client are preserved. Its historical results remain in [Task 001 report](task-001-report.md). The clean baseline was rechecked: 10 existing backend tests passed before changes.
+Task 001's React/TypeScript/Vite/Tailwind frontend, typed health client and FastAPI foundation are preserved. Task 002's canonical model, SQLite entities, repositories, UTC conventions and migrations are preserved.
 
-Task 002 adds typed schema-v1 resume content with stable UUIDs, partial dates, extended/custom sections, section visibility/order and bounded presentation metadata. Internal repositories persist revalidated JSON with owner-aware access, atomic expected-revision updates and explicitly created independent snapshots. SQLAlchemy manages three relational entities, UTC timestamps, foreign keys and caller-owned transactions. Alembic initialization is explicit; startup never creates tables. Readiness is separate from existing liveness.
+Task 003 adds typed synchronous HTTP routes calling application services through an injected transaction scope and structural repository boundary. Implemented: owner-scoped create/get/list/search/sort, atomic title/content edits, revision-protected hard deletion, independent duplication and checkpoint create/list/get. Title/content share one revision. Parent deletion preserves independent children and their checkpoints, clears direct lineage and advances child revisions. Ordinary edits never create snapshots.
+
+Development identity is default-off and requires explicit development settings, configured active User and loopback peer. The idempotent CLI bootstrap is separate from requests. There is no authentication or public deployment support. Bodies, collections, search and pagination are bounded; safe errors/logs omit private input and SQL details. Request IDs are server-generated.
 
 ## Actual validation
 
 | Check | Result |
 | --- | --- |
-| Baseline backend | 10 passed, one existing Starlette/HTTPX deprecation warning |
-| Final backend | **63 passed**, 10.86s; 35 domain, 18 persistence/migration/readiness, 10 original regression cases |
-| Concurrency | Two separate SQLite connections: one stale revision rejected; snapshot numbers 1 and 2 allocated distinctly |
-| Migrations | Fresh temporary upgrade, inspected constraints/indexes, downgrade, re-upgrade and metadata comparison passed |
-| Development database | Explicit upgrade to 0001_resume_foundation; current/check work from repository root and backend/; no drift |
-| Readiness | Automated 200/503 states, missing schema and unavailable file; live initialized database returned ready/200 |
-| Logging privacy | Echo on/off with inherited DEBUG: synthetic private value absent from captured logs |
-| Dependency consistency | pip check passed; unrelated packages unchanged |
-| Frontend | TypeScript, ESLint and production build passed; no frontend source/configuration edits |
-| Live integration | Actual frontend TypeScript health client through Vite proxy to Uvicorn passed; HTML/docs/OpenAPI HTTP 200 |
-| Git ignores | Database, WAL/SHM and journal files ignored; migration source visible; no tracked databases |
-| Syntax/whitespace | compileall and git diff --check passed |
-| Temporary servers | Task-owned ports 8012/5182 stopped; existing 8000/5173 processes left running |
-| Browser UI / PostgreSQL | Unverified; no browser or PostgreSQL tests performed |
+| Baseline | 63 passed, one existing warning; Windows sandbox temp-directory restrictions resolved by scoped execution outside sandbox |
+| Final backend | **139 passed**, 9.44s; one existing Starlette/HTTPX warning |
+| Ownership | Cross-owner CRUD/copy/checkpoint/history blocked; headers/payloads cannot override ownership |
+| Concurrency | Simultaneous service writers reject a stale revision; two HTTP clients cannot overwrite the same revision |
+| Transactions | Partial copy/snapshot/delete/integrity failures roll back writes and counters |
+| Migrations | Still 0001_resume_foundation; temporary upgrade/downgrade/re-upgrade and metadata check pass; no new migration |
+| Real HTTP | Disposable migrated database; complete lifecycle, stale 409, snapshot/copy independence, preserved sentinel and cleanup passed |
+| Identity | Disabled/production/missing/inactive/remote contexts fail closed; configured loopback works; bootstrap idempotent |
+| Privacy/bounds | Safe errors/logging, corrupt content, nested/streamed limits and generated correlation tested |
+| Frontend | TypeScript, ESLint, production build passed; source/config/dependencies unchanged |
+| Live connectivity | Actual TypeScript health client -> Vite 5183 -> Uvicorn 8013 passed; HTML/docs/schema 200 |
+| Dependencies / syntax | pip check and compileall passed; no dependencies added |
+| Whitespace | git diff --check passed; non-blocking LF/CRLF normalization notice |
+| Teardown | No listeners on owned 8013/5183; HTTP child stopped; unrelated processes preserved |
+| Unverified | Rendered browser/accessibility and PostgreSQL |
 
-Default SQLite database: `backend/.local/data/hiresense.sqlite3`, ignored and initialized without personal data or development owner seeding. Disposable test databases alone were downgraded. Sandbox installation/temporary-directory restrictions required scoped elevated execution; ordinary project commands are documented in README.
+The first HTTP lifecycle passed but transient Windows SQLite handles blocked disposable-directory cleanup. The harness now collects bootstrap/migration sqlite3 cycles; rerun passed including removal. The first leftover synthetic directory was separately removed. Genuine data was not used for test resumes or downgraded, and no development owner was seeded there.
 
 ## Limitations and handoff
 
-One existing upstream Starlette HTTPX deprecation warning remains. No authentication, public resume APIs, editor, rendering, ATS or AI functionality is implemented. Snapshot immutability is an application/ordinary ORM boundary; trusted SQL can bypass it. SQLite remains a single-writer database; short transactions and future safe whole-transaction retries may be needed under load. The application does not encrypt the database file. Browser rendering/accessibility and PostgreSQL remain unverified.
+One local configured owner without login; no public deployment. SQLite remains a single-writer database and may return 503 after timeout. Trusted SQL can bypass canonical validation and snapshot immutability. No database encryption, editor/dashboard, import/export, ATS, AI, restoration/diff or automatic history. New bounds can reject oversized preexisting JSON; stored content is never silently rewritten.
 
-See [Task 002 report](task-002-report.md), [canonical schema](../architecture/canonical-resume.md), [persistence](../architecture/persistence.md) and [ADR 002](../architecture/decisions/002-resume-persistence.md). Next separately assigned milestone: Task 003, resume management application services and REST endpoints. No commit, push or deployment was performed.
+See [Task 003 report](task-003-report.md), [API architecture](../architecture/resume-api.md), [ADR 003](../architecture/decisions/003-resume-services-api.md) and historical [Task 002 report](task-002-report.md). Next separately authorized milestone: Task 004 design system/application shell/navigation/resume library. No commit, push or deployment occurred.

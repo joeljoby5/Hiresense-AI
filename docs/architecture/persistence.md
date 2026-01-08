@@ -1,5 +1,7 @@
 # Resume persistence foundation
 
+Task 003 extension: application services now own transactions through an injected scope. SQLite service writes use BEGIN IMMEDIATE before identity/source reads; existing repository-only callers retain ordinary BEGIN. Title/content updates share the draft revision, checkpoint allocation optionally predicates on the expected revision, and metadata lists use bounded queries. The resume DELETE operation transactionally detaches direct children (advancing their revisions), then deletes the target and its cascading snapshots. Raw SQL parent deletion remains RESTRICTed. See [resume API](resume-api.md) and [ADR 003](decisions/003-resume-services-api.md). No tables or historical migrations changed.
+
 Only the three entities below are implemented. SQLAlchemy 2.x declarative models live in `app/models`; domain models have no database dependency. No ORM entity is an API response contract. Repositories are internal, explicit operations, without generic repository frameworks or speculative workflow services.
 
 ```mermaid

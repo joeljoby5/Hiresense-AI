@@ -15,24 +15,26 @@ flowchart LR
   Ready --> Data[SQLAlchemy / SQLite]
   Repositories[Internal owner-scoped repositories] --> Domain[Canonical resume document v1]
   Repositories --> Data
-  API -. future .-> Services[Application services]
+  API --> Services[Resume application services]
   Services -.-> Domain
-  Services -.-> Repositories
+  Services --> Repositories
   Services -.-> Intelligence[Future deterministic intelligence]
   Services -.-> Adapters[Document and optional AI provider adapters]
 ```
 
-Solid connections are implemented; dashed connections are plans. Browser presentation and HTTP transport are separated. The application factory accepts explicit settings, allowing tests to vary version, environment, namespace and allowed origins without mutating global configuration. The health route reports configuration only; it does not imply subsystem readiness.
+Solid connections are implemented; dashed connections are plans. Browser presentation and HTTP transport are separated. The frontend currently uses only system health; resume workflows are available through the API/Swagger. The application factory accepts explicit settings, allowing tests to vary version, environment, namespace and allowed origins without mutating global configuration. The health route reports configuration only; it does not imply subsystem readiness.
 
-Future business rules belong in application/domain code, independent of React, HTTP routing, storage implementations and AI vendors. Add these layers when actual behavior needs them. A health route does not warrant placeholder service or repository abstractions.
+Resume workflow rules now live in application services, independent of React, HTTP routing, storage implementations and AI vendors. Future intelligence rules belong in application/domain code; add integrations when actual behavior requires them.
 
 ## Implemented persistence
+
+Task 003 adds focused resume application services, an injected transaction boundary, a structural repository interface and typed owner-scoped REST workflows. Routes call services; services coordinate existing repositories and canonical validation. Local identity is explicitly initialized, disabled by default and prohibited outside development/loopback use. Metadata and content share atomic revision protection; checkpoints remain explicit. See [resume API architecture](resume-api.md) and [ADR 003](decisions/003-resume-services-api.md) for current boundaries and security restrictions.
 
 SQLite supports local development through synchronous SQLAlchemy 2.x, with explicit Alembic migrations. Only users, resumes and resume_versions exist. Canonical content is validated Pydantic schema-v1 JSON; ownership, draft revisions and snapshot numbering are relational. Repositories flush inside caller-owned transactions and expose no HTTP workflows. PostgreSQL can be considered later; it is untested and has no installed driver. See [persistence](persistence.md), [canonical schema](canonical-resume.md), and [ADR 002](decisions/002-resume-persistence.md).
 
 ## Planned modules and integrations
 
-Planned modules include resume management/versioning, document parsing/generation, deterministic ATS compatibility, job description intelligence, skill normalization/gaps, writing assistance, interview preparation, application tracking and career analytics. These are objectives, not completed capabilities.
+Foundational resume management and explicit checkpoints are implemented. Planned modules include advanced version restoration/comparison, document parsing/generation, deterministic ATS compatibility, job description intelligence, skill normalization/gaps, writing assistance, interview preparation, application tracking and career analytics. These remain objectives, not completed capabilities.
 
 External AI should sit behind provider adapters, configurable for local or cloud inference when separately authorized. Deterministic ATS, resume management and document generation must work without generative AI. No AI provider, model, mock generation or external inference call exists now.
 

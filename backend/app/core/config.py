@@ -1,4 +1,5 @@
 from pathlib import Path
+from uuid import UUID
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -21,6 +22,8 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///" + (BACKEND_ROOT / ".local/data/hiresense.sqlite3").as_posix()
     database_echo: bool = False
     debug: bool = False
+    development_identity_enabled: bool = False
+    development_owner_id: UUID | None = None
     api_prefix: str = "/api/v1"
     allowed_origins: list[str] = [
         "http://localhost:5173",

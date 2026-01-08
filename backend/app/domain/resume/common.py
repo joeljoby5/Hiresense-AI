@@ -10,6 +10,15 @@ Name = Annotated[str, Field(min_length=1, max_length=200)]
 class ValueModel(BaseModel):
     model_config = ConfigDict(extra="forbid", validate_assignment=True, str_strip_whitespace=True)
 
+    @field_validator("*", mode="before")
+    @classmethod
+    def bounded_values(cls, value):
+        if isinstance(value, (list, tuple)) and len(value) > 200:
+            raise ValueError("Resume collections may contain at most 200 items")
+        if isinstance(value, str) and len(value) > 10000:
+            raise ValueError("Resume strings may contain at most 10000 characters")
+        return value
+
     @field_validator("*", mode="after")
     @classmethod
     def plain_text(cls, value):

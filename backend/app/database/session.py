@@ -48,7 +48,9 @@ def build_engine(settings: Settings, *, initialize_directory: bool = False) -> E
 
         @event.listens_for(engine, "begin")
         def begin_sqlite(connection):
-            connection.exec_driver_sql("BEGIN")
+            connection.exec_driver_sql(
+                "BEGIN IMMEDIATE" if connection.get_execution_options().get("sqlite_write") else "BEGIN"
+            )
     return engine
 
 
