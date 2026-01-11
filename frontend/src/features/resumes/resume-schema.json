@@ -1,0 +1,1098 @@
+{
+  "$defs": {
+    "AcademicScore": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "system": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "System",
+          "type": "string"
+        },
+        "scale": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scale"
+        }
+      },
+      "required": [
+        "value",
+        "system"
+      ],
+      "title": "AcademicScore",
+      "type": "object"
+    },
+    "Achievement": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "maxLength": 10000,
+          "title": "Description",
+          "type": "string"
+        },
+        "organization": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Organization",
+          "type": "string"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "title"
+      ],
+      "title": "Achievement",
+      "type": "object"
+    },
+    "AdditionalEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ongoing": {
+          "default": false,
+          "title": "Ongoing",
+          "type": "boolean"
+        },
+        "title": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Title",
+          "type": "string"
+        },
+        "organization": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Organization",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "maxLength": 10000,
+          "title": "Description",
+          "type": "string"
+        },
+        "bullets": {
+          "items": {
+            "$ref": "#/$defs/Bullet"
+          },
+          "title": "Bullets",
+          "type": "array"
+        },
+        "links": {
+          "items": {
+            "$ref": "#/$defs/ProfessionalLink"
+          },
+          "title": "Links",
+          "type": "array"
+        }
+      },
+      "title": "AdditionalEntry",
+      "type": "object"
+    },
+    "Bullet": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "Bullet",
+      "type": "object"
+    },
+    "Certification": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "issuer": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Issuer",
+          "type": "string"
+        },
+        "issue_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "expiration_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "credential_id": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credential Id"
+        },
+        "credential_url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credential Url"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Certification",
+      "type": "object"
+    },
+    "Coursework": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Coursework",
+      "type": "object"
+    },
+    "CustomSection": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "maxLength": 10000,
+          "title": "Description",
+          "type": "string"
+        },
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/AdditionalEntry"
+          },
+          "title": "Entries",
+          "type": "array"
+        }
+      },
+      "required": [
+        "title"
+      ],
+      "title": "CustomSection",
+      "type": "object"
+    },
+    "Education": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ongoing": {
+          "default": false,
+          "title": "Ongoing",
+          "type": "boolean"
+        },
+        "institution": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Institution",
+          "type": "string"
+        },
+        "degree": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Degree",
+          "type": "string"
+        },
+        "field_of_study": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Field Of Study",
+          "type": "string"
+        },
+        "location": {
+          "default": "",
+          "maxLength": 300,
+          "title": "Location",
+          "type": "string"
+        },
+        "expected_graduation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "score": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AcademicScore"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "coursework": {
+          "items": {
+            "$ref": "#/$defs/Coursework"
+          },
+          "title": "Coursework",
+          "type": "array"
+        },
+        "description": {
+          "default": "",
+          "maxLength": 10000,
+          "title": "Description",
+          "type": "string"
+        },
+        "bullets": {
+          "items": {
+            "$ref": "#/$defs/Bullet"
+          },
+          "title": "Bullets",
+          "type": "array"
+        }
+      },
+      "title": "Education",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "entry_id": {
+          "format": "uuid",
+          "title": "Entry Id",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "maxLength": 10000,
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entry_id"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Experience": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ongoing": {
+          "default": false,
+          "title": "Ongoing",
+          "type": "boolean"
+        },
+        "organization": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Organization",
+          "type": "string"
+        },
+        "position": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Position",
+          "type": "string"
+        },
+        "employment_type": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Employment Type"
+        },
+        "location": {
+          "default": "",
+          "maxLength": 300,
+          "title": "Location",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "maxLength": 10000,
+          "title": "Description",
+          "type": "string"
+        },
+        "bullets": {
+          "items": {
+            "$ref": "#/$defs/Bullet"
+          },
+          "title": "Bullets",
+          "type": "array"
+        },
+        "technologies": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Technologies",
+          "type": "array"
+        }
+      },
+      "title": "Experience",
+      "type": "object"
+    },
+    "Language": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "proficiency": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Proficiency"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Language",
+      "type": "object"
+    },
+    "Margins": {
+      "additionalProperties": false,
+      "properties": {
+        "top": {
+          "default": 20,
+          "maximum": 50,
+          "minimum": 5,
+          "title": "Top",
+          "type": "number"
+        },
+        "right": {
+          "default": 20,
+          "maximum": 50,
+          "minimum": 5,
+          "title": "Right",
+          "type": "number"
+        },
+        "bottom": {
+          "default": 20,
+          "maximum": 50,
+          "minimum": 5,
+          "title": "Bottom",
+          "type": "number"
+        },
+        "left": {
+          "default": 20,
+          "maximum": 50,
+          "minimum": 5,
+          "title": "Left",
+          "type": "number"
+        }
+      },
+      "title": "Margins",
+      "type": "object"
+    },
+    "PartialDate": {
+      "additionalProperties": false,
+      "properties": {
+        "year": {
+          "maximum": 9999,
+          "minimum": 1,
+          "title": "Year",
+          "type": "integer"
+        },
+        "month": {
+          "anyOf": [
+            {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Month"
+        }
+      },
+      "required": [
+        "year"
+      ],
+      "title": "PartialDate",
+      "type": "object"
+    },
+    "PersonalInformation": {
+      "additionalProperties": false,
+      "properties": {
+        "full_name": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Full Name",
+          "type": "string"
+        },
+        "headline": {
+          "default": "",
+          "maxLength": 300,
+          "title": "Headline",
+          "type": "string"
+        },
+        "email": {
+          "anyOf": [
+            {
+              "format": "email",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Email"
+        },
+        "phone": {
+          "default": "",
+          "maxLength": 80,
+          "title": "Phone",
+          "type": "string"
+        },
+        "location": {
+          "default": "",
+          "maxLength": 300,
+          "title": "Location",
+          "type": "string"
+        },
+        "links": {
+          "items": {
+            "$ref": "#/$defs/ProfessionalLink"
+          },
+          "title": "Links",
+          "type": "array"
+        }
+      },
+      "title": "PersonalInformation",
+      "type": "object"
+    },
+    "PresentationSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "template_id": {
+          "default": "default",
+          "pattern": "^[a-zA-Z0-9_-]{1,80}$",
+          "title": "Template Id",
+          "type": "string"
+        },
+        "page_size": {
+          "default": "A4",
+          "enum": [
+            "A4",
+            "Letter"
+          ],
+          "title": "Page Size",
+          "type": "string"
+        },
+        "font_family": {
+          "default": "Arial",
+          "enum": [
+            "Arial",
+            "Calibri",
+            "Times New Roman",
+            "Georgia",
+            "Helvetica"
+          ],
+          "title": "Font Family",
+          "type": "string"
+        },
+        "font_size": {
+          "default": 11,
+          "maximum": 24,
+          "minimum": 8,
+          "title": "Font Size",
+          "type": "number"
+        },
+        "line_spacing": {
+          "default": 1.15,
+          "maximum": 2.5,
+          "minimum": 1,
+          "title": "Line Spacing",
+          "type": "number"
+        },
+        "section_spacing": {
+          "default": 8,
+          "maximum": 40,
+          "minimum": 0,
+          "title": "Section Spacing",
+          "type": "number"
+        },
+        "margins": {
+          "$ref": "#/$defs/Margins"
+        },
+        "accent_color": {
+          "default": "#243B53",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "title": "Accent Color",
+          "type": "string"
+        }
+      },
+      "title": "PresentationSettings",
+      "type": "object"
+    },
+    "ProfessionalLink": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "default": "other",
+          "maxLength": 50,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "label": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Label",
+          "type": "string"
+        },
+        "url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "ProfessionalLink",
+      "type": "object"
+    },
+    "Project": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PartialDate"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ongoing": {
+          "default": false,
+          "title": "Ongoing",
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "maxLength": 200,
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "maxLength": 10000,
+          "title": "Description",
+          "type": "string"
+        },
+        "contributions": {
+          "items": {
+            "$ref": "#/$defs/Bullet"
+          },
+          "title": "Contributions",
+          "type": "array"
+        },
+        "bullets": {
+          "items": {
+            "$ref": "#/$defs/Bullet"
+          },
+          "title": "Bullets",
+          "type": "array"
+        },
+        "technologies": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Technologies",
+          "type": "array"
+        },
+        "links": {
+          "items": {
+            "$ref": "#/$defs/ProfessionalLink"
+          },
+          "title": "Links",
+          "type": "array"
+        },
+        "status": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Status"
+        }
+      },
+      "title": "Project",
+      "type": "object"
+    },
+    "SectionConfiguration": {
+      "additionalProperties": false,
+      "properties": {
+        "section_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Section Id",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "visible": {
+          "default": true,
+          "title": "Visible",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "section_id"
+      ],
+      "title": "SectionConfiguration",
+      "type": "object"
+    },
+    "Skill": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "category": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Category"
+        },
+        "canonical_skill_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Canonical Skill Id"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Skill",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "language": {
+      "default": "en",
+      "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$",
+      "title": "Language",
+      "type": "string"
+    },
+    "personal_information": {
+      "$ref": "#/$defs/PersonalInformation"
+    },
+    "professional_summary": {
+      "default": "",
+      "maxLength": 10000,
+      "title": "Professional Summary",
+      "type": "string"
+    },
+    "career_objective": {
+      "default": "",
+      "maxLength": 10000,
+      "title": "Career Objective",
+      "type": "string"
+    },
+    "experience": {
+      "items": {
+        "$ref": "#/$defs/Experience"
+      },
+      "title": "Experience",
+      "type": "array"
+    },
+    "education": {
+      "items": {
+        "$ref": "#/$defs/Education"
+      },
+      "title": "Education",
+      "type": "array"
+    },
+    "skills": {
+      "items": {
+        "$ref": "#/$defs/Skill"
+      },
+      "title": "Skills",
+      "type": "array"
+    },
+    "projects": {
+      "items": {
+        "$ref": "#/$defs/Project"
+      },
+      "title": "Projects",
+      "type": "array"
+    },
+    "certifications": {
+      "items": {
+        "$ref": "#/$defs/Certification"
+      },
+      "title": "Certifications",
+      "type": "array"
+    },
+    "achievements": {
+      "items": {
+        "$ref": "#/$defs/Achievement"
+      },
+      "title": "Achievements",
+      "type": "array"
+    },
+    "publications": {
+      "items": {
+        "$ref": "#/$defs/AdditionalEntry"
+      },
+      "title": "Publications",
+      "type": "array"
+    },
+    "research": {
+      "items": {
+        "$ref": "#/$defs/AdditionalEntry"
+      },
+      "title": "Research",
+      "type": "array"
+    },
+    "volunteer_experience": {
+      "items": {
+        "$ref": "#/$defs/AdditionalEntry"
+      },
+      "title": "Volunteer Experience",
+      "type": "array"
+    },
+    "leadership_experience": {
+      "items": {
+        "$ref": "#/$defs/AdditionalEntry"
+      },
+      "title": "Leadership Experience",
+      "type": "array"
+    },
+    "languages": {
+      "items": {
+        "$ref": "#/$defs/Language"
+      },
+      "title": "Languages",
+      "type": "array"
+    },
+    "relevant_coursework": {
+      "items": {
+        "$ref": "#/$defs/Coursework"
+      },
+      "title": "Relevant Coursework",
+      "type": "array"
+    },
+    "custom_sections": {
+      "items": {
+        "$ref": "#/$defs/CustomSection"
+      },
+      "title": "Custom Sections",
+      "type": "array"
+    },
+    "section_order": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Section Order",
+      "type": "array"
+    },
+    "section_configuration": {
+      "items": {
+        "$ref": "#/$defs/SectionConfiguration"
+      },
+      "title": "Section Configuration",
+      "type": "array"
+    },
+    "presentation_settings": {
+      "$ref": "#/$defs/PresentationSettings"
+    }
+  },
+  "title": "ResumeDocument",
+  "type": "object"
+}
