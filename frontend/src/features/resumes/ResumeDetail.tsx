@@ -32,7 +32,7 @@ function ResumeDetailContent({ id }: { id: string }) {
   return <>
     <Link to="/workspace/resumes">My resumes</Link>
     <header className="page-heading"><div><h1>{resume.title}</h1><p>Draft {resume.draft_revision} · Updated {formatDate(resume.updated_at)}</p></div>
-      <div className="row"><button className="button secondary" onClick={() => { checkpoint.reset(); setDialog(true) }}>Save checkpoint</button></div>
+      <div className="row"><button className="button secondary" onClick={() => { checkpoint.reset(); setDialog(true) }}>Save checkpoint</button><Link className="button primary" to="edit">Edit resume</Link></div>
     </header>
     <section className="surface recent" id="versions">
       <h2>Version history</h2>

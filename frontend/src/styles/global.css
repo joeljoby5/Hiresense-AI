@@ -139,6 +139,23 @@ dialog::backdrop { background: #0d1a2c99; }
   .mobile-menu { display: inline-flex; }
   .overview-grid { grid-template-columns: minmax(0, 1fr); }
 }
+.editor-heading { margin: 0; }
+.editor-heading label { margin-top: .6rem; }
+.editor-grid { display: grid; grid-template-columns: minmax(9rem, .55fr) minmax(0, 1fr); gap: .8rem; align-items: start; }
+.editor-sections { display: grid; gap: .3rem; padding: .65rem; }
+.section-link { text-align: left; color: var(--muted); padding: .55rem; border-radius: .45rem; overflow-wrap: anywhere; }
+.section-link[aria-current], .section-link:hover { background: var(--surface-alt); color: var(--accent); }
+.field-group, .field-inline { min-width: 0; display: grid; gap: .65rem; }
+.field-group { border: 1px solid var(--line); border-radius: .55rem; padding: .7rem; }
+.field-group legend { padding: 0 .3rem; font-weight: 650; font-size: .94rem; }
+.array-entry { border-top: 1px solid var(--line); padding: .65rem 0; display: grid; gap: .4rem; }
+.entry-actions span { margin-right: auto; color: var(--muted); }
+.check-label { display: flex; gap: .45rem; align-items: center; }
+.check-label input { width: 1rem; height: 1rem; accent-color: var(--primary); }
+@media (max-width: 575px) {
+  .editor-grid { grid-template-columns: minmax(0, 1fr); }
+  .editor-sections { display: flex; flex-wrap: wrap; }
+}
 .error-fields { list-style: disc; padding-left: 1.3rem; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; }

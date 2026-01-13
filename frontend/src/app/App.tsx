@@ -21,6 +21,7 @@ const router = createBrowserRouter([
       { index: true, lazy: async () => ({ Component: (await import('../features/resumes/ResumeLibrary')).Overview }) },
       { path: 'resumes', lazy: async () => ({ Component: (await import('../features/resumes/ResumeLibrary')).ResumeLibrary }) },
       { path: 'resumes/:resumeId', lazy: async () => ({ Component: (await import('../features/resumes/ResumeDetail')).ResumeDetail }) },
+      { path: 'resumes/:resumeId/edit', lazy: async () => ({ Component: (await import('../features/resumes/ResumeEditor')).ResumeEditor }) },
       { path: 'help', Component: WorkspaceHelp },
       { path: '*', Component: WorkspaceError },
     ],
