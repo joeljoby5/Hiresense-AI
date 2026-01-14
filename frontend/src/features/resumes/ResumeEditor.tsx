@@ -6,8 +6,10 @@ import type { Resume } from './api'
 import { DocumentField } from './DocumentField'
 import type { DocumentValue, ResumeDocument } from './document'
 import { Modal, RequestFailure } from './ResumeUi'
-import { array, fields, identifier, label, move, newValue, object, removeStaleReferences, sections, string } from './schema'
+import { array, fields, identifier, label, move, newValue, object, removeStaleReferences, resolve, sections, string } from './schema'
 import { useDraft } from './useDraft'
+import { ResumePreview } from './ResumePreview'
+import { getTemplate, templates } from './templates'
 
 export function ResumeEditor() {
   const { resumeId = '' } = useParams()
@@ -22,6 +24,7 @@ function Editor({ resume }: { resume: Resume }) {
   const document = draft.draft.content
   const [params] = useSearchParams()
   const [selected, setSelected] = useState(() => params.get('section') || 'personal_information')
+  const [preview, setPreview] = useState(false)
   const [discard, setDiscard] = useState(false)
   const [copied, setCopied] = useState('')
   const sectionIds = sections(document)
@@ -75,7 +78,11 @@ function Editor({ resume }: { resume: Resume }) {
       </div>
       {copied && <p role="status">{copied}</p>}
     </div>}
-    <div className="editor-grid">
+    <div className="toggle editor-toggle" role="group" aria-label="Editor mode">
+      <button className="button secondary" aria-pressed={!preview} onClick={() => setPreview(false)}>Edit</button>
+      <button className="button secondary" aria-pressed={preview} onClick={() => setPreview(true)}>Preview</button>
+    </div>
+    <div className={'editor-grid' + (preview ? ' editor-preview-mode' : '')}>
       <nav className="surface editor-sections" aria-label="Resume sections">
         {sectionIds.map((key) => <button key={key} className="section-link" aria-current={key === section ? 'true' : undefined} onClick={() => setSelected(key)}>{title(key)}</button>)}
         <button className="button secondary" disabled={custom.length >= 185} onClick={() => {
@@ -83,21 +90,39 @@ function Editor({ resume }: { resume: Resume }) {
           update({ ...document, custom_sections: [...custom, value] })
           setSelected(identifier(value))
         }}>Add custom section</button>
+        <button className="button secondary section-link" aria-current={selected === 'presentation_settings' ? 'true' : undefined} onClick={() => setSelected('presentation_settings')}>Presentation</button>
       </nav>
       <section className="surface stack editor-fields" aria-label="Section fields">
-        <h2>{title(section)}</h2>
-        <div className="row">
-          <button className="icon-button" aria-label="Move section up" disabled={sectionIds[0] === section} onClick={() => update({ ...document, section_order: move(sectionIds, sectionIds.indexOf(section), sectionIds.indexOf(section) - 1) })}><ArrowUp size={18} /></button>
-          <button className="icon-button" aria-label="Move section down" disabled={sectionIds.at(-1) === section} onClick={() => update({ ...document, section_order: move(sectionIds, sectionIds.indexOf(section), sectionIds.indexOf(section) + 1) })}><ArrowDown size={18} /></button>
-          <label className="check-label"><input type="checkbox" checked={current.visible !== false} onChange={(event) => configure({ visible: event.target.checked })} /> Show in document</label>
-          {!fields[section] && <button className="button secondary" onClick={() => {
-            update(removeStaleReferences({ ...document, custom_sections: custom.filter((value) => identifier(value) !== section) }))
-            setSelected('personal_information')
-          }}>Remove section</button>}
-        </div>
-        <label>Display heading<input maxLength={200} value={string(current.title)} placeholder={title(section)} onChange={(event) => configure({ title: event.target.value || null })} /></label>
-        <DocumentField name={fields[section] ? section : ''} schema={fields[section] ?? fields.custom_sections!.items!} value={document[section] ?? custom.find((value) => identifier(value) === section) ?? null} change={changeSection} />
+        <h2>{selected === 'presentation_settings' ? 'Presentation' : title(section)}</h2>
+        {selected === 'presentation_settings' ? <>
+          <label>Template<select value={string(object(document.presentation_settings).template_id)} onChange={(event) => {
+            const template = getTemplate(event.target.value)
+            update({ ...document, presentation_settings: {
+              ...object(document.presentation_settings), template_id: event.target.value, font_family: template.font,
+              font_size: template.size, line_spacing: template.line, section_spacing: template.spacing,
+            } })
+          }}><option value="default">Classic (default)</option>{templates.map((template) => <option key={template.id} value={template.id}>{template.name}</option>)}</select></label>
+          <DocumentField name="" schema={{
+            ...fields.presentation_settings,
+            $ref: undefined,
+            type: 'object',
+            properties: Object.fromEntries(Object.entries(resolvePresentation()).filter(([key]) => key !== 'template_id')),
+          }} value={document.presentation_settings ?? null} change={(value) => update({ ...document, presentation_settings: value })} />
+        </> : <>
+          <div className="row">
+            <button className="icon-button" aria-label="Move section up" disabled={sectionIds[0] === section} onClick={() => update({ ...document, section_order: move(sectionIds, sectionIds.indexOf(section), sectionIds.indexOf(section) - 1) })}><ArrowUp size={18} /></button>
+            <button className="icon-button" aria-label="Move section down" disabled={sectionIds.at(-1) === section} onClick={() => update({ ...document, section_order: move(sectionIds, sectionIds.indexOf(section), sectionIds.indexOf(section) + 1) })}><ArrowDown size={18} /></button>
+            <label className="check-label"><input type="checkbox" checked={current.visible !== false} onChange={(event) => configure({ visible: event.target.checked })} /> Show in document</label>
+            {!fields[section] && <button className="button secondary" onClick={() => {
+              update(removeStaleReferences({ ...document, custom_sections: custom.filter((value) => identifier(value) !== section) }))
+              setSelected('personal_information')
+            }}>Remove section</button>}
+          </div>
+          <label>Display heading<input maxLength={200} value={string(current.title)} placeholder={title(section)} onChange={(event) => configure({ title: event.target.value || null })} /></label>
+          <DocumentField name={fields[section] ? section : ''} schema={fields[section] ?? fields.custom_sections!.items!} value={document[section] ?? custom.find((value) => identifier(value) === section) ?? null} change={changeSection} />
+        </>}
       </section>
+      <div className="editor-preview"><ResumePreview document={document} /></div>
     </div>
     {draft.blocker.state === 'blocked' && <Modal title="Leave editor?" onDismiss={draft.blocker.reset}>
       <p>Unsaved edits may be lost when you leave.</p>
@@ -110,4 +135,8 @@ function Editor({ resume }: { resume: Resume }) {
         <button className="button danger" onClick={() => { draft.reloadLatest(); setDiscard(false) }}>Load saved draft</button></div>
     </Modal>}
   </div>
+}
+
+function resolvePresentation() {
+  return resolve(fields.presentation_settings!).properties ?? {}
 }
