@@ -10,3 +10,7 @@ httpx
 SQLAlchemy>=2.0,<2.1
 alembic
 email-validator
+
+reportlab
+python-docx
+pypdf

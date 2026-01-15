@@ -7,7 +7,7 @@ from app.repositories.users import UserRepository
 from app.services.errors import IdentityUnavailableError
 
 
-def resume_scope(factory):
+def resume_scope(factory, repository=ResumeRepository):
     @contextmanager
     def scope(owner_id: UUID, write: bool):
         with transaction(factory) as session:
@@ -17,5 +17,5 @@ def resume_scope(factory):
             owner = UserRepository(session).get(owner_id)
             if owner is None or not owner.is_active:
                 raise IdentityUnavailableError()
-            yield ResumeRepository(session)
+            yield repository(session)
     return scope

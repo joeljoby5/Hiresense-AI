@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.exports import router as exports_router
 from app.api.readiness import router as readiness_router
 from app.api.resumes import router as resumes_router
 from app.api.errors import install_error_handlers
@@ -13,6 +14,7 @@ from app.core.request_context import RequestContextMiddleware
 from app.database.session import build_engine, session_factory
 from app.database.resume_scope import resume_scope
 from app.core.config import Settings
+from app.repositories.exports import ExportRepository
 
 logger = logging.getLogger(__name__)
 
@@ -38,14 +40,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     application = FastAPI(
         title=config.app_name,
-        description="Local development resume management API. Explicit local identity initialization is required. No public authentication or deployment support.",
+        description="Local career workspace API for resumes and exports.",
         version=config.app_version,
         debug=False,  # Debug settings may enable safe logs, never HTTP tracebacks.
         lifespan=lifespan,
     )
     application.state.settings = config
     application.state.database_engine = build_engine(config)
-    application.state.resume_scope = resume_scope(session_factory(application.state.database_engine))
+    factory = session_factory(application.state.database_engine)
+    application.state.resume_scope = resume_scope(factory)
+    application.state.export_scope = resume_scope(factory, ExportRepository)
+
     install_error_handlers(application)
     application.add_middleware(RequestContextMiddleware)
     application.add_middleware(
@@ -59,6 +64,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(health_router, prefix=config.api_prefix)
     application.include_router(readiness_router, prefix=config.api_prefix)
     application.include_router(resumes_router, prefix=config.api_prefix)
+    application.include_router(exports_router, prefix=config.api_prefix)
     return application
 
 

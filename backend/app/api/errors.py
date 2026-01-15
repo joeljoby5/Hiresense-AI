@@ -5,6 +5,7 @@ from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
 from app.repositories.errors import NotFoundError, RevisionConflictError
+from app.documents.render import ExportBusyError, ExportContentError
 from app.schemas.errors import APIError, APIErrorResponse
 from app.services.errors import IdentityUnavailableError
 
@@ -30,12 +31,18 @@ def install_error_handlers(app):
         if isinstance(exc, IdentityUnavailableError):
             return error_response(request_id, 503, "DEVELOPMENT_IDENTITY_UNAVAILABLE", "Local development identity is unavailable.")
         if isinstance(exc, NotFoundError):
+            if str(exc) == "Export not found":
+                return error_response(request_id, 404, "RESUME_EXPORT_NOT_FOUND", "The requested export was not found.")
             version = str(exc) == "Version not found"
             return error_response(request_id, 404, "RESUME_VERSION_NOT_FOUND" if version else "RESUME_NOT_FOUND",
                                   "The requested version was not found." if version else "The requested resume was not found.")
         if isinstance(exc, RevisionConflictError):
             return error_response(request_id, 409, "RESUME_REVISION_CONFLICT", "The resume has changed. Retrieve its current revision.",
                                   current_revision=exc.current_revision)
+        if isinstance(exc, ExportContentError):
+            return error_response(request_id, 422, "UNSUPPORTED_EXPORT_CONTENT", str(exc))
+        if isinstance(exc, ExportBusyError):
+            return error_response(request_id, 503, "EXPORT_BUSY", "The document renderer is busy. Try again shortly.")
         if isinstance(exc, IntegrityError):
             return error_response(request_id, 500, "INTERNAL_ERROR", "The operation could not be completed.")
         if isinstance(exc, DBAPIError):
@@ -45,5 +52,5 @@ def install_error_handlers(app):
         return error_response(request_id, 500, "INTERNAL_ERROR", "The operation could not be completed.")
 
     for kind in (RequestValidationError, IdentityUnavailableError, NotFoundError, RevisionConflictError,
-                 SQLAlchemyError, ValidationError, HTTPException):
+                 SQLAlchemyError, ValidationError, HTTPException, ExportContentError, ExportBusyError):
         app.add_exception_handler(kind, handler)

@@ -6,7 +6,7 @@ from app.database.base import Base
 from app import models  # register metadata
 
 router = APIRouter()
-INITIAL_REVISION = "0001_resume_foundation"
+REQUIRED_REVISION = "0002_resume_exports"
 
 @router.get("/ready", tags=["System"], responses={503: {"description": "Database unavailable"}})
 def get_readiness(request: Request) -> JSONResponse:
@@ -23,7 +23,7 @@ def get_readiness(request: Request) -> JSONResponse:
                     for name, table in Base.metadata.tables.items()
                 )
             if ready:
-                ready = connection.execute(text("SELECT version_num FROM alembic_version")).scalars().all() == [INITIAL_REVISION]
+                ready = connection.execute(text("SELECT version_num FROM alembic_version")).scalars().all() == [REQUIRED_REVISION]
     except (SQLAlchemyError, OSError):
         ready = False
     return JSONResponse({"status": "ready" if ready else "unavailable"}, status_code=200 if ready else 503)

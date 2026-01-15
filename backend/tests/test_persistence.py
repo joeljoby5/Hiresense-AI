@@ -182,7 +182,9 @@ def test_concurrent_snapshots_allocate_distinct_numbers(database):
 def test_migration_upgrade_downgrade_reupgrade(database):
     settings, engine, _ = database
     inspector = inspect(engine)
-    assert set(inspector.get_table_names()) == {"users", "resumes", "resume_versions", "alembic_version"}
+    assert set(inspector.get_table_names()) == {
+        "users", "resumes", "resume_versions", "resume_exports", "alembic_version",
+    }
     assert any(fk["constrained_columns"] == ["parent_resume_id", "owner_id"] for fk in inspector.get_foreign_keys("resumes"))
     assert len(inspector.get_foreign_keys("resume_versions")) == 1
     assert {"column_names": ["resume_id", "version_number"], "name": "uq_resume_versions_resume_id_version_number"} in inspector.get_unique_constraints("resume_versions")
