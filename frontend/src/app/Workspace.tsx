@@ -88,7 +88,7 @@ export function WorkspaceHelp() {
       <li>Initialize the local owner with <code>python -m app.initialize_owner</code> and set the owner UUID in the backend environment.</li>
       <li>Start the local API and frontend on loopback addresses.</li>
     </ol>
-    <p>Deleting a resume permanently removes its checkpoints. Independent copies remain available.</p>
+    <p>Deleting a resume permanently removes its checkpoints and exports. Independent copies remain available.</p>
     <Link className="button secondary" to="/workspace/resumes">Resume library</Link>
   </section>
 }

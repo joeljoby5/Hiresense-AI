@@ -107,6 +107,7 @@ export function ResumeLibrary() {
         <div className="card-actions">
           <div className="row">
             <Link to={'/workspace/resumes/' + resume.id + '#versions'}>History</Link>
+            <Link to={'/workspace/resumes/' + resume.id + '#exports'}>Export</Link>
           </div>
           <div className="row">
             <button className="icon-button" aria-label={'Rename ' + resume.title} title="Rename" onClick={() => setAction({ kind: 'rename', resume })}><Pencil size={17} /></button>

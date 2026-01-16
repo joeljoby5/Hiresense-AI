@@ -191,6 +191,9 @@ dialog::backdrop { background: #0d1a2c99; }
   .editor-grid { grid-template-columns: minmax(0, 1fr); }
   .editor-sections { display: flex; flex-wrap: wrap; }
 }
+.export-source { width: min(20rem, 100%); margin: 1rem 0; }
+#exports { margin-top: 1rem; }
+#exports .pagination { margin: 0 0 .7rem; }
 .error-fields { list-style: disc; padding-left: 1.3rem; }
 .preview-pages { margin-top: .75rem; }
 @media (prefers-reduced-motion: reduce) {

@@ -13,6 +13,9 @@ export class ApiError extends Error {
       INVALID_REQUEST: 'Some fields need attention.',
       INVALID_RESUME_CONTENT: 'Some resume fields need attention.',
       REQUEST_TOO_LARGE: 'The resume exceeds the maximum request size.',
+      UNSUPPORTED_EXPORT_CONTENT: 'This document exceeds export limits or contains unsupported characters. Try another format.',
+      EXPORT_BUSY: 'The document renderer is busy. Try again shortly.',
+      RESUME_EXPORT_NOT_FOUND: 'This export is no longer available.',
       OFFLINE: 'Could not reach the backend. Check that the local server is running.',
     }[code] ?? 'The request could not be completed.')
   }

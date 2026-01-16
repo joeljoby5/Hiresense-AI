@@ -1,4 +1,4 @@
-import { request } from '../../services/api'
+import { base, request } from '../../services/api'
 export { ApiError } from '../../services/api'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ResumeDocument } from './document'
@@ -22,6 +22,17 @@ export interface Version {
   created_at: string
 }
 
+export type ExportFormat = 'pdf' | 'docx' | 'txt' | 'json'
+
+export interface ResumeExport {
+  id: string
+  source_revision: number
+  source_version_id: string | null
+  format: ExportFormat
+  created_at: string
+  size_bytes: number
+}
+
 interface Page<T> { items: T[]; total: number; has_more: boolean }
 export type Sort = 'updated_desc' | 'updated_asc' | 'title_asc' | 'title_desc'
 
@@ -36,6 +47,9 @@ export const resumeApi = {
   remove: (id: string, revision: number) => request<void>(path(id) + '?expected_revision=' + revision, 'DELETE'),
   checkpoint: (id: string, expected_revision: number, change_summary: string | null) =>
     request<Version>(path(id) + '/versions', 'POST', { expected_revision, change_summary }),
+  export: (id: string, format: ExportFormat, source: { expected_revision: number } | { version_id: string }) =>
+    request<ResumeExport>(path(id) + '/exports', 'POST', { format, ...source }),
+  downloadUrl: (id: string, exportId: string) => base + path(id) + '/exports/' + encodeURIComponent(exportId),
 }
 
 export function useResumes(search = '', sort: Sort = 'updated_desc', offset = 0, limit = 9) {
@@ -57,6 +71,13 @@ export function useVersions(id: string, offset: number) {
   })
 }
 
+export function useExports(id: string) {
+  return useQuery({
+    queryKey: ['exports', id],
+    queryFn: ({ signal }) => request<ResumeExport[]>(path(id) + '/exports', 'GET', undefined, signal),
+  })
+}
+
 export function useResumeCache() {
   const cache = useQueryClient()
   return {
@@ -65,6 +86,7 @@ export function useResumeCache() {
       if (removedId) {
         cache.removeQueries({ queryKey: ['resumes', 'detail', removedId] })
         cache.removeQueries({ queryKey: ['versions', removedId] })
+        cache.removeQueries({ queryKey: ['exports', removedId] })
       }
       void cache.invalidateQueries({ queryKey: ['resumes', 'list'] })
     },

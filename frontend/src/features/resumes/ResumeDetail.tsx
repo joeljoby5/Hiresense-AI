@@ -4,6 +4,7 @@ import { Link, useLocation, useParams } from 'react-router'
 import { resumeApi, useResume, useResumeCache, useVersions } from './api'
 import { Modal, Pagination, RequestFailure } from './ResumeUi'
 import { formatDate } from './format'
+import { ResumeExports } from './ResumeExports'
 
 export function ResumeDetail() {
   const { resumeId = '' } = useParams()
@@ -16,6 +17,7 @@ function ResumeDetailContent({ id }: { id: string }) {
   const [offset, setOffset] = useState(0)
   const [dialog, setDialog] = useState(false)
   const [summary, setSummary] = useState('')
+  const [exportVersion, setExportVersion] = useState<string>()
   const versions = useVersions(id, offset)
   const { hash } = useLocation()
   const checkpoint = useMutation({
@@ -25,7 +27,7 @@ function ResumeDetailContent({ id }: { id: string }) {
   })
   const resume = query.data
   useEffect(() => {
-    if (resume && hash === '#versions') document.getElementById(hash.slice(1))?.scrollIntoView()
+    if (resume && (hash === '#versions' || hash === '#exports')) document.getElementById(hash.slice(1))?.scrollIntoView()
   }, [hash, resume])
   if (query.isPending) return <p role="status">Loading resume…</p>
   if (query.error || !resume) return <RequestFailure error={query.error ?? new Error('Resume unavailable.')} retry={() => void query.refetch()} />
@@ -42,8 +44,13 @@ function ResumeDetailContent({ id }: { id: string }) {
         <div><strong>Version {version.version_number}</strong><p>Draft {version.source_draft_revision}{version.change_summary ? ' · ' + version.change_summary : ''}</p></div>
         <time dateTime={version.created_at}>{formatDate(version.created_at)}</time>
       </li>)}</ul> : versions.data && <p>Save a checkpoint to keep a record of this draft.</p>}
-      {versions.data && <Pagination offset={offset} limit={10} total={versions.data.total} more={versions.data.has_more} change={setOffset} />}
+      {versions.data && <Pagination offset={offset} limit={10} total={versions.data.total} more={versions.data.has_more} change={(value) => { setOffset(value); setExportVersion(undefined) }} />}
     </section>
+    <label className="export-source">Export source<select value={exportVersion ?? ''} onChange={(event) => setExportVersion(event.target.value || undefined)}>
+      <option value="">Current saved draft</option>
+      {versions.data?.items.map((version) => <option key={version.id} value={version.id}>Version {version.version_number}</option>)}
+    </select></label>
+    <ResumeExports resume={resume} version={versions.data?.items.find((item) => item.id === exportVersion)} />
     {dialog && <Modal title="Save checkpoint" onDismiss={() => { if (!checkpoint.isPending) setDialog(false) }}>
     <form className="stack" onSubmit={(event) => { event.preventDefault(); if (!checkpoint.isPending) checkpoint.mutate(resume.draft_revision) }}>
         <p>Keep a permanent snapshot of draft {resume.draft_revision}.</p>

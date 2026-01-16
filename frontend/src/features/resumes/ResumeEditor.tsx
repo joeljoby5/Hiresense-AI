@@ -66,6 +66,7 @@ function Editor({ resume }: { resume: Resume }) {
         <button className="icon-button" aria-label="Undo" disabled={!draft.canUndo} onClick={draft.undo}><Undo2 size={19} /></button>
         <button className="icon-button" aria-label="Redo" disabled={!draft.canRedo} onClick={draft.redo}><Redo2 size={19} /></button>
         <button className="button primary" disabled={!draft.dirty || draft.saving || draft.conflict || !draft.draft.title.trim()} onClick={() => void draft.save()}>Save draft</button>
+        <Link className="button secondary" to={'/workspace/resumes/' + resume.id + '#exports'}>Export saved draft</Link>
       </div>
     </header>
     {draft.failure && <RequestFailure error={draft.failure} />}
