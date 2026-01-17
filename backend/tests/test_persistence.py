@@ -183,7 +183,7 @@ def test_migration_upgrade_downgrade_reupgrade(database):
     settings, engine, _ = database
     inspector = inspect(engine)
     assert set(inspector.get_table_names()) == {
-        "users", "resumes", "resume_versions", "resume_exports", "alembic_version",
+        "users", "resumes", "resume_versions", "resume_exports", "jobs", "alembic_version",
     }
     assert any(fk["constrained_columns"] == ["parent_resume_id", "owner_id"] for fk in inspector.get_foreign_keys("resumes"))
     assert len(inspector.get_foreign_keys("resume_versions")) == 1

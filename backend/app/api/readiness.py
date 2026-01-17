@@ -6,7 +6,7 @@ from app.database.base import Base
 from app import models  # register metadata
 
 router = APIRouter()
-REQUIRED_REVISION = "0002_resume_exports"
+REQUIRED_REVISION = "0003_job_workspace"
 
 @router.get("/ready", tags=["System"], responses={503: {"description": "Database unavailable"}})
 def get_readiness(request: Request) -> JSONResponse:

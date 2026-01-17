@@ -7,3 +7,11 @@ class RevisionConflictError(Exception):
     def __init__(self, message: str, current_revision: int | None = None):
         super().__init__(message)
         self.current_revision = current_revision
+
+
+class JobNotFound(NotFoundError):
+    pass
+
+
+class JobConflict(RevisionConflictError):
+    pass

@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
 from app.api.exports import router as exports_router
+from app.api.jobs import router as jobs_router
 from app.api.readiness import router as readiness_router
 from app.api.resumes import router as resumes_router
 from app.api.errors import install_error_handlers
@@ -15,6 +16,7 @@ from app.database.session import build_engine, session_factory
 from app.database.resume_scope import resume_scope
 from app.core.config import Settings
 from app.repositories.exports import ExportRepository
+from app.repositories.jobs import JobRepository
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +42,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     application = FastAPI(
         title=config.app_name,
-        description="Local career workspace API for resumes and exports.",
+        description="Local career workspace API for resumes and jobs.",
         version=config.app_version,
         debug=False,  # Debug settings may enable safe logs, never HTTP tracebacks.
         lifespan=lifespan,
@@ -50,6 +52,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     factory = session_factory(application.state.database_engine)
     application.state.resume_scope = resume_scope(factory)
     application.state.export_scope = resume_scope(factory, ExportRepository)
+    application.state.job_scope = resume_scope(factory, JobRepository)
 
     install_error_handlers(application)
     application.add_middleware(RequestContextMiddleware)
@@ -65,6 +68,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(readiness_router, prefix=config.api_prefix)
     application.include_router(resumes_router, prefix=config.api_prefix)
     application.include_router(exports_router, prefix=config.api_prefix)
+    application.include_router(jobs_router, prefix=config.api_prefix)
     return application
 
 
