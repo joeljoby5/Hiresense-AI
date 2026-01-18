@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FileText, LayoutDashboard, CircleHelp, Menu, Moon, Sun, X, ShieldCheck, Layers, Files } from 'lucide-react'
+import { FileText, LayoutDashboard, CircleHelp, Menu, Moon, Sun, X, ShieldCheck, Layers, Files, BriefcaseBusiness } from 'lucide-react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router'
 
 function Brand() {
@@ -20,6 +20,7 @@ function ThemeButton() {
 const navigation = [
   { to: '/workspace', label: 'Overview', icon: LayoutDashboard },
   { to: '/workspace/resumes', label: 'My resumes', icon: Files },
+  { to: '/workspace/jobs', label: 'Job workspace', icon: BriefcaseBusiness },
   { to: '/workspace/help', label: 'Help', icon: CircleHelp },
 ]
 

@@ -199,4 +199,9 @@ dialog::backdrop { background: #0d1a2c99; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; }
 }
+.job-form { max-width: 58rem; }
+.job-description { min-height: 12rem; }
+.form-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .85rem; }
+.form-columns > .stack { align-content: start; }
 .button[aria-pressed="true"] { background: var(--surface-alt); color: var(--accent); }
+@media (max-width: 575px) { .form-columns { grid-template-columns: 1fr; } }

@@ -9,6 +9,8 @@ export class ApiError extends Error {
       DEVELOPMENT_IDENTITY_UNAVAILABLE: 'The local workspace owner is unavailable. See Help for setup.',
       DATABASE_UNAVAILABLE: 'The workspace database is unavailable.',
       RESUME_REVISION_CONFLICT: 'This resume changed in another session.',
+      JOB_NOT_FOUND: 'This job listing is unavailable.',
+      JOB_REVISION_CONFLICT: 'This job listing changed in another session.',
       RESUME_NOT_FOUND: 'This resume is unavailable.',
       INVALID_REQUEST: 'Some fields need attention.',
       INVALID_RESUME_CONTENT: 'Some resume fields need attention.',
