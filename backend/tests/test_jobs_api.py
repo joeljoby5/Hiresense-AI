@@ -56,3 +56,13 @@ def test_job_validation(api):
     for change in ({}, {"archived": "true"}, {"details": {"title": "partial"}}, {"expected_revision": True}):
         assert client.patch(endpoint, json={"expected_revision": 1, **change}).status_code == 422
     assert client.get(endpoint).json()["revision"] == 1
+
+def test_job_requirements_are_owner_scoped(api):
+    client, _, other = api
+    job = client.post("/api/v1/jobs", json=DETAIL)
+    endpoint = job.headers["location"] + "/requirements"
+    result = client.get(endpoint).json()
+    assert result["extractor_version"] == "job-requirements-1"
+    assert result["requirements"][0]["alternatives"] == ["python"]
+    client.app.dependency_overrides[resolve_owner] = lambda: other.owner_id
+    assert client.get(endpoint).status_code == 404

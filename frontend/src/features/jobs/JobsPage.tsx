@@ -6,6 +6,7 @@ import { Modal, Pagination, RequestFailure } from '../resumes/ResumeUi'
 import { formatDate } from '../resumes/format'
 import { jobApi, useJob, useJobs } from './api'
 import type { Job, JobInput, JobSort } from './api'
+import { JobRequirements } from './JobRequirements'
 
 const pageSize = 12
 const empty: JobInput = { title: '', company: '', description: '', listing_url: null, location: '', employment_type: '', notes: '' }
@@ -76,6 +77,7 @@ function JobEditor({ initial }: { initial?: Job }) {
     onSuccess: (job) => {
       cache.setQueryData(['jobs', 'detail', job.id], job)
       void cache.invalidateQueries({ queryKey: ['jobs', 'list'] })
+      void cache.invalidateQueries({ queryKey: ['jobs', 'requirements', job.id] })
       setSaved(job)
       setForm(job.details)
       setMessage(job.archived ? 'Saved to archived jobs.' : 'Listing saved.')
@@ -116,6 +118,7 @@ function JobEditor({ initial }: { initial?: Job }) {
       <div className="row"><button className="button primary" disabled={!dirty || !canSave || save.isPending}>{save.isPending ? 'Saving…' : 'Save job'}</button>
         {message && <p role="status">{message}</p>}</div>
     </form>
+    {saved && <JobRequirements id={saved.id} />}
     {confirm && saved && <Modal title="Delete job" onDismiss={() => { if (!remove.isPending) setConfirm(false) }}>
       <div className="stack"><p>Permanently delete this listing and its notes?</p>
         {remove.error && <RequestFailure error={remove.error} />}

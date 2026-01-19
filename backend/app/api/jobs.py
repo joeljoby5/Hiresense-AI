@@ -6,6 +6,7 @@ from pydantic import Field, model_validator
 
 from app.api.identity import resolve_owner
 from app.domain.jobs.models import JobDescription
+from app.domain.intelligence.requirements import Extraction
 from app.schemas.resumes import RequestModel, Revision
 from app.services.jobs import JobDetail, JobService, JobSummary
 from app.services.resumes import Page
@@ -56,6 +57,11 @@ def list_jobs(query: Annotated[JobQuery, Query()], service: Service):
 @router.get("/{job_id}", response_model=JobDetail)
 def get_job(job_id: UUID, service: Service):
     return service.get(job_id)
+
+
+@router.get("/{job_id}/requirements", response_model=Extraction)
+def get_requirements(job_id: UUID, service: Service):
+    return service.requirements(job_id)
 
 
 @router.patch("/{job_id}", response_model=JobDetail)

@@ -24,6 +24,16 @@ export interface JobSummary {
 export interface Job extends JobSummary { details: JobInput }
 export type JobSort = 'updated_desc' | 'title_asc'
 interface JobsPage { items: JobSummary[]; total: number; has_more: boolean }
+interface Requirements {
+  extractor_version: string
+  seniority: string | null
+  role_category: string | null
+  skill_names: Record<string, string>
+  requirements: Array<{
+    kind: string; priority: string; alternatives: string[]; evidence: string; start: number; end: number;
+  }>
+}
+
 const path = (id: string) => '/jobs/' + encodeURIComponent(id)
 
 export const jobApi = {
@@ -44,4 +54,11 @@ export function useJobs(archived: boolean, search: string, sort: JobSort, offset
 
 export function useJob(id: string) {
   return useQuery({ queryKey: ['jobs', 'detail', id], queryFn: ({ signal }) => jobApi.get(id, signal) })
+}
+
+export function useJobRequirements(id: string) {
+  return useQuery({
+    queryKey: ['jobs', 'requirements', id],
+    queryFn: ({ signal }) => request<Requirements>(path(id) + '/requirements', 'GET', undefined, signal),
+  })
 }

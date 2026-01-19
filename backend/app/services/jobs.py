@@ -7,6 +7,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 from app.domain.jobs.models import JobDescription
+from app.domain.intelligence.requirements import extract_requirements
 from app.services.resumes import Page
 
 
@@ -65,6 +66,10 @@ class JobService:
     def get(self, job_id: UUID) -> JobDetail:
         with self.scope(self.owner_id, False) as store:
             return detail(store.get(self.owner_id, job_id))
+
+    def requirements(self, job_id: UUID):
+        job = self.get(job_id)
+        return extract_requirements(job.details.description, job.title)
 
     def list(self, archived: bool, search: str, sort: str, offset: int, limit: int) -> Page[JobSummary]:
         with self.scope(self.owner_id, False) as store:
