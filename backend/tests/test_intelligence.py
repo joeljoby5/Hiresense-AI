@@ -49,3 +49,38 @@ Responsibilities:
     assert not any("tensorflow" in item.alternatives for item in items)
     assert items[-1].kind == "responsibility"
     assert extract_requirements("").requirements == ()
+
+def test_ats_keeps_readability_separate_and_preserves_alternative_groups():
+    from app.domain.intelligence.ats import run_analysis
+    from app.domain.resume.models import ResumeDocument
+
+    job = extract_requirements("Required: Python or Java. Preferred: AWS. Master's degree preferred.")
+    draft = ResumeDocument.model_validate({
+        "skills": [{"name": "Python"}],
+        "projects": [{"name": "Example", "technologies": ["Python"]}],
+        "personal_information": {"email": "candidate@example.org", "phone": "555-0100"},
+    })
+    report = run_analysis(draft, job)
+    assert report.compatibility.coverage == 90 and report.compatibility.provisional
+    assert report.compatibility.components[0].score == 100
+    assert report.readability.score is not None and report.readability.coverage == 50
+    assert report.readability.components[0].status == "unknown"
+    assert report.skills[0].alternatives == ("python", "java") and report.skills[0].status == "matched"
+    assert report.skills[1].status == "not_evidenced"
+    assert any(evidence.section == "projects" for evidence in report.skills[0].evidence["python"])
+    altered = draft.model_copy(deep=True)
+    altered.personal_information.full_name = "AWS Java"
+    assert run_analysis(altered, job).compatibility == report.compatibility
+    assert run_analysis(altered, job).skills == report.skills
+
+
+def test_ats_withholds_scores_for_unknown_requirements():
+    from app.domain.intelligence.ats import run_analysis
+    from app.domain.resume.models import ResumeDocument
+
+    outcome = run_analysis(ResumeDocument(), extract_requirements("We value an inclusive workplace."))
+    assert outcome.compatibility.score is None and outcome.compatibility.coverage == 0
+    assert outcome.readability.score is None
+    target = extract_requirements("Required: PostgreSQL.")
+    outcome = run_analysis(ResumeDocument(), target)
+    assert outcome.compatibility.score == 0 and outcome.compatibility.coverage == 90
