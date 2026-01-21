@@ -4,7 +4,8 @@ from sqlalchemy.exc import DBAPIError, IntegrityError, SQLAlchemyError
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
-from app.repositories.errors import JobConflict, JobNotFound, NotFoundError, RevisionConflictError
+from app.repositories.errors import AnalysisNotFound, JobConflict, JobNotFound, NotFoundError, RevisionConflictError
+from app.services.analyses import AnalysisLimitError
 from app.documents.render import ExportBusyError, ExportContentError
 from app.schemas.errors import APIError, APIErrorResponse
 from app.services.errors import IdentityUnavailableError
@@ -31,6 +32,8 @@ def install_error_handlers(app):
         if isinstance(exc, IdentityUnavailableError):
             return error_response(request_id, 503, "DEVELOPMENT_IDENTITY_UNAVAILABLE", "Local development identity is unavailable.")
         if isinstance(exc, NotFoundError):
+            if isinstance(exc, AnalysisNotFound):
+                return error_response(request_id, 404, "ANALYSIS_NOT_FOUND", "The requested analysis was not found.")
             if isinstance(exc, JobNotFound):
                 return error_response(request_id, 404, "JOB_NOT_FOUND", "The requested job listing was not found.")
             if str(exc) == "Export not found":
@@ -48,6 +51,8 @@ def install_error_handlers(app):
             return error_response(request_id, 422, "UNSUPPORTED_EXPORT_CONTENT", str(exc))
         if isinstance(exc, ExportBusyError):
             return error_response(request_id, 503, "EXPORT_BUSY", "The document renderer is busy. Try again shortly.")
+        if isinstance(exc, AnalysisLimitError):
+            return error_response(request_id, 422, "ANALYSIS_TOO_LARGE", "The analysis exceeds the size limit.")
         if isinstance(exc, IntegrityError):
             return error_response(request_id, 500, "INTERNAL_ERROR", "The operation could not be completed.")
         if isinstance(exc, DBAPIError):
@@ -57,5 +62,5 @@ def install_error_handlers(app):
         return error_response(request_id, 500, "INTERNAL_ERROR", "The operation could not be completed.")
 
     for kind in (RequestValidationError, IdentityUnavailableError, NotFoundError, RevisionConflictError,
-                 SQLAlchemyError, ValidationError, HTTPException, ExportContentError, ExportBusyError):
+                 SQLAlchemyError, ValidationError, HTTPException, ExportContentError, ExportBusyError, AnalysisLimitError):
         app.add_exception_handler(kind, handler)

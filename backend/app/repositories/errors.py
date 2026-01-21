@@ -15,3 +15,7 @@ class JobNotFound(NotFoundError):
 
 class JobConflict(RevisionConflictError):
     pass
+
+
+class AnalysisNotFound(NotFoundError):
+    pass
