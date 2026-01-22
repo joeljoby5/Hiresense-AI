@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FileText, LayoutDashboard, CircleHelp, Menu, Moon, Sun, X, ShieldCheck, Layers, Files, BriefcaseBusiness } from 'lucide-react'
+import { FileText, LayoutDashboard, CircleHelp, Menu, Moon, Sun, X, ShieldCheck, Layers, Files, BriefcaseBusiness, ScanSearch } from 'lucide-react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router'
 
 function Brand() {
@@ -20,6 +20,7 @@ function ThemeButton() {
 const navigation = [
   { to: '/workspace', label: 'Overview', icon: LayoutDashboard },
   { to: '/workspace/resumes', label: 'My resumes', icon: Files },
+  { to: '/workspace/analyzer', label: 'Resume analyzer', icon: ScanSearch },
   { to: '/workspace/jobs', label: 'Job workspace', icon: BriefcaseBusiness },
   { to: '/workspace/help', label: 'Help', icon: CircleHelp },
 ]
@@ -89,7 +90,7 @@ export function WorkspaceHelp() {
       <li>Initialize the local owner with <code>python -m app.initialize_owner</code> and set the owner UUID in the backend environment.</li>
       <li>Start the local API and frontend on loopback addresses.</li>
     </ol>
-    <p>Deleting a resume permanently removes its checkpoints and exports. Independent copies remain available.</p>
+    <p>Deleting a resume permanently removes its checkpoints, exports and analyses. Independent copies remain available.</p>
     <Link className="button secondary" to="/workspace/resumes">Resume library</Link>
   </section>
 }

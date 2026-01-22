@@ -25,6 +25,7 @@ const router = createBrowserRouter([
       { path: 'jobs', lazy: async () => ({ Component: (await import('../features/jobs/JobsPage')).JobsPage }) },
       { path: 'jobs/new', lazy: async () => ({ Component: (await import('../features/jobs/JobsPage')).NewJob }) },
       { path: 'jobs/:jobId', lazy: async () => ({ Component: (await import('../features/jobs/JobsPage')).EditJob }) },
+      { path: 'analyzer', lazy: async () => ({ Component: (await import('../features/analysis/AnalysisPage')).AnalysisPage }) },
       { path: 'help', Component: WorkspaceHelp },
       { path: '*', Component: WorkspaceError },
     ],
