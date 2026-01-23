@@ -9,6 +9,9 @@ from app.api.health import router as health_router
 from app.api.exports import router as exports_router
 from app.api.jobs import router as jobs_router
 from app.api.analyses import router as analyses_router
+from app.api.ai import router as ai_router
+from app.ai.local import LocalAIProvider
+from app.ai.mock import DisabledProvider, MockAIProvider
 from app.api.readiness import router as readiness_router
 from app.api.resumes import router as resumes_router
 from app.api.errors import install_error_handlers
@@ -19,6 +22,7 @@ from app.core.config import Settings
 from app.repositories.exports import ExportRepository
 from app.repositories.jobs import JobRepository
 from app.repositories.analyses import AnalysisRepository
+from app.services.writing import WritingService
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +61,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.state.job_scope = resume_scope(factory, JobRepository)
     application.state.analysis_scope = resume_scope(factory, AnalysisRepository)
 
+    if config.ai_provider == "mock":
+        provider = MockAIProvider()
+    elif config.ai_provider == "disabled":
+        provider = DisabledProvider()
+    else:
+        provider = LocalAIProvider(config.local_ai_origin, config.local_ai_model, config.ai_provider)
+    application.state.writing = WritingService(provider)
     install_error_handlers(application)
     application.add_middleware(RequestContextMiddleware)
     application.add_middleware(
@@ -73,6 +84,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(exports_router, prefix=config.api_prefix)
     application.include_router(jobs_router, prefix=config.api_prefix)
     application.include_router(analyses_router, prefix=config.api_prefix)
+    application.include_router(ai_router, prefix=config.api_prefix)
     return application
 
 

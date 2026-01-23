@@ -6,6 +6,7 @@ from starlette.responses import JSONResponse
 
 from app.repositories.errors import AnalysisNotFound, JobConflict, JobNotFound, NotFoundError, RevisionConflictError
 from app.services.analyses import AnalysisLimitError
+from app.services.writing import SuggestionInputError
 from app.documents.render import ExportBusyError, ExportContentError
 from app.schemas.errors import APIError, APIErrorResponse
 from app.services.errors import IdentityUnavailableError
@@ -53,6 +54,16 @@ def install_error_handlers(app):
             return error_response(request_id, 503, "EXPORT_BUSY", "The document renderer is busy. Try again shortly.")
         if isinstance(exc, AnalysisLimitError):
             return error_response(request_id, 422, "ANALYSIS_TOO_LARGE", "The analysis exceeds the size limit.")
+        if isinstance(exc, SuggestionInputError):
+            return error_response(request_id, 422, "SUGGESTION_INPUT_REQUIRED", "Provide a saved summary and any required consent.")
+        if isinstance(exc, ProviderUnavailable):
+            return error_response(request_id, 503, "AI_UNAVAILABLE", "The selected writing provider is unavailable.")
+        if isinstance(exc, ProviderTimeout):
+            return error_response(request_id, 504, "AI_TIMEOUT", "The selected writing provider timed out.")
+        if isinstance(exc, ProviderRateLimited):
+            return error_response(request_id, 429, "AI_BUSY", "The writing provider is busy. Try again shortly.")
+        if isinstance(exc, InvalidProviderResponse):
+            return error_response(request_id, 502, "AI_INVALID_RESPONSE", "The writing provider returned an invalid suggestion.")
         if isinstance(exc, IntegrityError):
             return error_response(request_id, 500, "INTERNAL_ERROR", "The operation could not be completed.")
         if isinstance(exc, DBAPIError):
@@ -62,5 +73,7 @@ def install_error_handlers(app):
         return error_response(request_id, 500, "INTERNAL_ERROR", "The operation could not be completed.")
 
     for kind in (RequestValidationError, IdentityUnavailableError, NotFoundError, RevisionConflictError,
-                 SQLAlchemyError, ValidationError, HTTPException, ExportContentError, ExportBusyError, AnalysisLimitError):
+                 SQLAlchemyError, ValidationError, HTTPException, ExportContentError, ExportBusyError, AnalysisLimitError,
+                 SuggestionInputError, ProviderUnavailable, ProviderTimeout, ProviderRateLimited, InvalidProviderResponse):
         app.add_exception_handler(kind, handler)
+from app.ai.contracts import InvalidProviderResponse, ProviderRateLimited, ProviderTimeout, ProviderUnavailable

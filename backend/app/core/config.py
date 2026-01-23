@@ -1,7 +1,8 @@
 from pathlib import Path
+from typing import Literal
 from uuid import UUID
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,11 +25,23 @@ class Settings(BaseSettings):
     debug: bool = False
     development_identity_enabled: bool = False
     development_owner_id: UUID | None = None
+    ai_provider: Literal["disabled", "mock", "ollama", "openai-compatible"] = "mock"
+    local_ai_origin: str | None = None
+    local_ai_model: str | None = Field(default=None, min_length=1, max_length=150, pattern=r"^[A-Za-z0-9][A-Za-z0-9_./:-]*$")
     api_prefix: str = "/api/v1"
     allowed_origins: list[str] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
     ]
+
+    @model_validator(mode="after")
+    def validate_ai(self):
+        if self.ai_provider in {"ollama", "openai-compatible"}:
+            if self.local_ai_origin is None or self.local_ai_model is None:
+                raise ValueError("Local AI requires an origin and a model.")
+            from app.ai.local import validate_local_origin
+            validate_local_origin(self.local_ai_origin)
+        return self
 
     @field_validator("api_prefix")
     @classmethod
