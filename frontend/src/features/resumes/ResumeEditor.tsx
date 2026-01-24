@@ -10,6 +10,7 @@ import { array, fields, identifier, label, move, newValue, object, removeStaleRe
 import { useDraft } from './useDraft'
 import { ResumePreview } from './ResumePreview'
 import { getTemplate, templates } from './templates'
+import { SummarySuggestion } from './SummarySuggestion'
 
 export function ResumeEditor() {
   const { resumeId = '' } = useParams()
@@ -121,6 +122,9 @@ function Editor({ resume }: { resume: Resume }) {
           </div>
           <label>Display heading<input maxLength={200} value={string(current.title)} placeholder={title(section)} onChange={(event) => configure({ title: event.target.value || null })} /></label>
           <DocumentField name={fields[section] ? section : ''} schema={fields[section] ?? fields.custom_sections!.items!} value={document[section] ?? custom.find((value) => identifier(value) === section) ?? null} change={changeSection} />
+          {section === 'professional_summary' && <SummarySuggestion resumeId={resume.id} revision={draft.revision}
+            summary={string(document.professional_summary)} canSuggest={!draft.dirty && !draft.saving && !draft.conflict}
+            apply={changeSection} />}
         </>}
       </section>
       <div className="editor-preview"><ResumePreview document={document} /></div>

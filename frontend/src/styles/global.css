@@ -208,3 +208,4 @@ dialog::backdrop { background: #0d1a2c99; }
 .job-form + .job-form { margin-top: 1.1rem; }
 .requirement-list { margin-top: .65rem; }
 .requirement-list li strong, .requirement-list li > span { text-transform: capitalize; }
+.suggestion-comparison p { white-space: pre-wrap; overflow-wrap: anywhere; }
