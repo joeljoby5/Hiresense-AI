@@ -9,7 +9,9 @@ from app.services.analyses import AnalysisLimitError
 from app.services.writing import SuggestionInputError
 from app.documents.render import ExportBusyError, ExportContentError
 from app.schemas.errors import APIError, APIErrorResponse
-from app.services.errors import IdentityUnavailableError
+from app.services.errors import (
+    AccountExists, AuthenticationBusy, AuthenticationRequired, CsrfRejected, IdentityUnavailableError, InvalidCredentials,
+)
 
 
 def error_response(request_id, status, code, message, **metadata):
@@ -32,6 +34,16 @@ def install_error_handlers(app):
             return error_response(request_id, 422, code, "Request validation failed.", fields=fields)
         if isinstance(exc, IdentityUnavailableError):
             return error_response(request_id, 503, "DEVELOPMENT_IDENTITY_UNAVAILABLE", "Local development identity is unavailable.")
+        if isinstance(exc, AuthenticationRequired):
+            return error_response(request_id, 401, "SIGN_IN_REQUIRED", "Sign in to continue.")
+        if isinstance(exc, InvalidCredentials):
+            return error_response(request_id, 401, "INVALID_CREDENTIALS", "The account credentials could not be verified.")
+        if isinstance(exc, CsrfRejected):
+            return error_response(request_id, 403, "UNTRUSTED_REQUEST", "This request could not be verified.")
+        if isinstance(exc, AccountExists):
+            return error_response(request_id, 409, "REGISTRATION_UNAVAILABLE", "Unable to register this account.")
+        if isinstance(exc, AuthenticationBusy):
+            return error_response(request_id, 429, "AUTH_RATE_LIMITED", "Too many account requests. Try again shortly.")
         if isinstance(exc, NotFoundError):
             if isinstance(exc, AnalysisNotFound):
                 return error_response(request_id, 404, "ANALYSIS_NOT_FOUND", "The requested analysis was not found.")
@@ -74,6 +86,7 @@ def install_error_handlers(app):
 
     for kind in (RequestValidationError, IdentityUnavailableError, NotFoundError, RevisionConflictError,
                  SQLAlchemyError, ValidationError, HTTPException, ExportContentError, ExportBusyError, AnalysisLimitError,
-                 SuggestionInputError, ProviderUnavailable, ProviderTimeout, ProviderRateLimited, InvalidProviderResponse):
+                 SuggestionInputError, ProviderUnavailable, ProviderTimeout, ProviderRateLimited, InvalidProviderResponse,
+                 AuthenticationRequired, InvalidCredentials, CsrfRejected, AccountExists, AuthenticationBusy):
         app.add_exception_handler(kind, handler)
 from app.ai.contracts import InvalidProviderResponse, ProviderRateLimited, ProviderTimeout, ProviderUnavailable

@@ -1,5 +1,5 @@
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
 from collections.abc import AsyncIterator
 
 from fastapi import FastAPI
@@ -10,18 +10,22 @@ from app.api.exports import router as exports_router
 from app.api.jobs import router as jobs_router
 from app.api.analyses import router as analyses_router
 from app.api.ai import router as ai_router
+from app.api.accounts import router as accounts_router
 from app.ai.local import LocalAIProvider
 from app.ai.mock import DisabledProvider, MockAIProvider
 from app.api.readiness import router as readiness_router
 from app.api.resumes import router as resumes_router
 from app.api.errors import install_error_handlers
 from app.core.request_context import RequestContextMiddleware
-from app.database.session import build_engine, session_factory
+from app.database.session import build_engine, session_factory, transaction
 from app.database.resume_scope import resume_scope
 from app.core.config import Settings
 from app.repositories.exports import ExportRepository
 from app.repositories.jobs import JobRepository
 from app.repositories.analyses import AnalysisRepository
+from app.repositories.accounts import AccountRepository
+from app.security.throttle import LoginAttempts
+from app.services.accounts import AccountService
 from app.services.writing import WritingService
 
 logger = logging.getLogger(__name__)
@@ -48,7 +52,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     application = FastAPI(
         title=config.app_name,
-        description="Career workspace API for resumes, jobs and deterministic analysis.",
+        description="Career workspace API for accounts, resumes, jobs and deterministic analysis.",
         version=config.app_version,
         debug=False,  # Debug settings may enable safe logs, never HTTP tracebacks.
         lifespan=lifespan,
@@ -61,6 +65,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.state.job_scope = resume_scope(factory, JobRepository)
     application.state.analysis_scope = resume_scope(factory, AnalysisRepository)
 
+    @contextmanager
+    def account_scope(write: bool):
+        with transaction(factory) as session:
+            session.connection(execution_options={"sqlite_write": write})
+            yield AccountRepository(session)
+
+    application.state.accounts = AccountService(account_scope)
+    application.state.login_attempts = LoginAttempts()
     if config.ai_provider == "mock":
         provider = MockAIProvider()
     elif config.ai_provider == "disabled":
@@ -73,9 +85,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.add_middleware(
         CORSMiddleware,
         allow_origins=config.allowed_origins,
-        allow_credentials=False,
+        allow_credentials=True,
         allow_methods=["GET", "POST", "PATCH", "DELETE"],
-        allow_headers=["Accept", "Content-Type"],
+        allow_headers=["Accept", "Content-Type", "X-CSRF-Token"],
         expose_headers=["X-Request-ID", "Location"],
     )
     application.include_router(health_router, prefix=config.api_prefix)
@@ -85,6 +97,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(jobs_router, prefix=config.api_prefix)
     application.include_router(analyses_router, prefix=config.api_prefix)
     application.include_router(ai_router, prefix=config.api_prefix)
+    application.include_router(accounts_router, prefix=config.api_prefix)
     return application
 
 

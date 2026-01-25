@@ -9,6 +9,7 @@ class User(Base):
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
     email: Mapped[str] = mapped_column(String(320), unique=True)
     password_hash: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    display_name: Mapped[str] = mapped_column(String(120), server_default="")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utc_now, onupdate=utc_now)

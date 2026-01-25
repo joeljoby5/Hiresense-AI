@@ -13,6 +13,8 @@ const loading = <main className="workspace-content" role="status">Loading worksp
 
 const router = createBrowserRouter([
   { path: '/', Component: LandingPage },
+  { path: '/login', hydrateFallbackElement: loading, lazy: async () => ({ Component: (await import('../features/accounts/AccountPage')).Login }) },
+  { path: '/register', hydrateFallbackElement: loading, lazy: async () => ({ Component: (await import('../features/accounts/AccountPage')).Register }) },
   {
     path: '/workspace',
     Component: Workspace,
@@ -26,6 +28,7 @@ const router = createBrowserRouter([
       { path: 'jobs/new', lazy: async () => ({ Component: (await import('../features/jobs/JobsPage')).NewJob }) },
       { path: 'jobs/:jobId', lazy: async () => ({ Component: (await import('../features/jobs/JobsPage')).EditJob }) },
       { path: 'analyzer', lazy: async () => ({ Component: (await import('../features/analysis/AnalysisPage')).AnalysisPage }) },
+      { path: 'account', lazy: async () => ({ Component: (await import('../features/accounts/AccountPage')).AccountPage }) },
       { path: 'help', Component: WorkspaceHelp },
       { path: '*', Component: WorkspaceError },
     ],

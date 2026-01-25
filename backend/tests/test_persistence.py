@@ -183,7 +183,7 @@ def test_migration_upgrade_downgrade_reupgrade(database):
     settings, engine, _ = database
     inspector = inspect(engine)
     assert set(inspector.get_table_names()) == {
-        "users", "resumes", "resume_versions", "resume_exports", "jobs", "ats_analyses", "alembic_version",
+        "users", "resumes", "resume_versions", "resume_exports", "jobs", "ats_analyses", "account_sessions", "alembic_version",
     }
     assert any(fk["constrained_columns"] == ["parent_resume_id", "owner_id"] for fk in inspector.get_foreign_keys("resumes"))
     assert len(inspector.get_foreign_keys("resume_versions")) == 1
@@ -198,6 +198,34 @@ def test_migration_upgrade_downgrade_reupgrade(database):
     command.upgrade(migration_config(settings), "head")
     assert "resumes" in inspect(engine).get_table_names()
     command.check(migration_config(settings))
+
+
+def test_upgrade_preserves_legacy_workspace_rows(tmp_path):
+    settings = Settings(_env_file=None, database_url="sqlite:///" + (tmp_path / "legacy.sqlite3").as_posix())
+    migration = migration_config(settings)
+    command.upgrade(migration, "0001_resume_foundation")
+    engine = build_engine(settings)
+    owner, resume = uuid4(), uuid4()
+    try:
+        with engine.begin() as connection:
+            connection.execute(text(
+                "INSERT INTO users (id, email, is_active, created_at, updated_at) "
+                "VALUES (:id, :email, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+            ), {"id": owner.hex, "email": "legacy@example.org"})
+            connection.execute(text(
+                "INSERT INTO resumes (id, owner_id, title, draft_content, draft_revision, next_version_number, created_at, updated_at) "
+                "VALUES (:id, :owner, :title, :content, 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+            ), {"id": resume.hex, "owner": owner.hex, "title": "Legacy draft", "content": "{}"})
+        command.upgrade(migration, "head")
+        with engine.connect() as connection:
+            user = connection.execute(text("SELECT email, display_name FROM users WHERE id = :id"), {"id": owner.hex}).one()
+            draft = connection.execute(text(
+                "SELECT owner_id, title, draft_revision, draft_content FROM resumes WHERE id = :id"
+            ), {"id": resume.hex}).one()
+        assert user == ("legacy@example.org", "")
+        assert draft == (owner.hex, "Legacy draft", 2, "{}")
+    finally:
+        engine.dispose()
 
 
 def test_readiness_states_and_liveness(tmp_path):

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FileText, LayoutDashboard, CircleHelp, Menu, Moon, Sun, X, ShieldCheck, Layers, Files, BriefcaseBusiness, ScanSearch } from 'lucide-react'
+import { FileText, LayoutDashboard, CircleHelp, Menu, Moon, Sun, X, ShieldCheck, Layers, Files, BriefcaseBusiness, ScanSearch, UserRound } from 'lucide-react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router'
 
 function Brand() {
@@ -22,6 +22,7 @@ const navigation = [
   { to: '/workspace/resumes', label: 'My resumes', icon: Files },
   { to: '/workspace/analyzer', label: 'Resume analyzer', icon: ScanSearch },
   { to: '/workspace/jobs', label: 'Job workspace', icon: BriefcaseBusiness },
+  { to: '/workspace/account', label: 'Account', icon: UserRound },
   { to: '/workspace/help', label: 'Help', icon: CircleHelp },
 ]
 
@@ -56,7 +57,7 @@ export function Workspace() {
 
 export function LandingPage() {
   return <div className="public-page">
-    <header className="public-header"><Brand /><nav aria-label="Main"><Link to="/workspace" className="button secondary">Open workspace</Link><ThemeButton /></nav></header>
+    <header className="public-header"><Brand /><nav aria-label="Main"><Link to="/login">Sign in</Link><Link to="/workspace" className="button secondary">Open workspace</Link><ThemeButton /></nav></header>
     <main>
       <section className="hero">
         <div>
@@ -84,6 +85,7 @@ export function LandingPage() {
 export function WorkspaceHelp() {
   return <section className="prose-panel">
     <h1>Workspace help</h1>
+    <p>Start the local backend and <Link to="/register">create an account</Link> to open a private workspace.</p>
     <h2>Developer workspace setup</h2>
     <ol>
       <li>Apply the Alembic migrations in the repository README.</li>

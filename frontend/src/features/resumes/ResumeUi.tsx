@@ -13,6 +13,7 @@ export function RequestFailure({ error, retry }: { error: Error; retry?: () => v
       </ul>}
       <div className="row">
         {error instanceof ApiError && error.code === 'DEVELOPMENT_IDENTITY_UNAVAILABLE' && <Link to="/workspace/help">Workspace setup</Link>}
+        {error instanceof ApiError && ['DEVELOPMENT_IDENTITY_UNAVAILABLE', 'SIGN_IN_REQUIRED'].includes(error.code) && <Link to="/login">Sign in</Link>}
         {retry && <button type="button" className="button secondary" onClick={retry}>Try again</button>}
       </div>
     </div>

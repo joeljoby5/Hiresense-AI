@@ -209,3 +209,5 @@ dialog::backdrop { background: #0d1a2c99; }
 .requirement-list { margin-top: .65rem; }
 .requirement-list li strong, .requirement-list li > span { text-transform: capitalize; }
 .suggestion-comparison p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.auth-page { width: min(calc(100% - 2rem), 30rem); margin: clamp(1rem, 8vh, 6rem) auto; }
+.account-page { max-width: 44rem; }

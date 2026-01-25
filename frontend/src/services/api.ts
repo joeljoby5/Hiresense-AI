@@ -1,4 +1,9 @@
 export const base = (import.meta.env.VITE_API_BASE_URL || '/api/v1').replace(/\/+$/, '')
+let csrf: string | null | undefined
+let csrfRequest: Promise<unknown> | undefined
+
+export function setCsrf(value: string | null) { csrf = value }
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -7,6 +12,11 @@ export class ApiError extends Error {
   ) {
     super({
       DEVELOPMENT_IDENTITY_UNAVAILABLE: 'The local workspace owner is unavailable. See Help for setup.',
+      SIGN_IN_REQUIRED: 'Sign in to continue.',
+      INVALID_CREDENTIALS: 'The account credentials could not be verified.',
+      UNTRUSTED_REQUEST: 'The request could not be verified. Refresh your session and try again.',
+      REGISTRATION_UNAVAILABLE: 'Unable to register this account.',
+      AUTH_RATE_LIMITED: 'Too many account requests. Try again shortly.',
       DATABASE_UNAVAILABLE: 'The workspace database is unavailable.',
       RESUME_REVISION_CONFLICT: 'This resume changed in another session.',
       JOB_NOT_FOUND: 'This job listing is unavailable.',
@@ -29,13 +39,22 @@ export class ApiError extends Error {
 }
 
 export async function request<T>(url: string, method = 'GET', data?: unknown, signal?: AbortSignal, timeoutMs = 8000): Promise<T> {
+  const unsafe = method !== 'GET' && method !== 'HEAD'
+  if (unsafe && csrf === undefined && !['/auth/login', '/auth/register'].includes(url)) {
+    csrfRequest ??= request('/auth/me').catch((error) => {
+      if (!(error instanceof ApiError && error.status === 401)) throw error
+    }).finally(() => { csrfRequest = undefined })
+    await csrfRequest
+  }
   const timeout = AbortSignal.timeout(timeoutMs)
   try {
     const headers: Record<string, string> = { Accept: 'application/json' }
     if (data !== undefined) headers['Content-Type'] = 'application/json'
+    if (unsafe && csrf) headers['X-CSRF-Token'] = csrf
     const response = await fetch(base + url, {
       method,
       signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+      credentials: 'include',
       cache: 'no-store',
       headers,
       body: data === undefined ? undefined : JSON.stringify(data),
@@ -46,6 +65,7 @@ export async function request<T>(url: string, method = 'GET', data?: unknown, si
     }
     const body = await response.json()
     if (!response.ok) {
+      if (response.status === 401 && url === '/auth/me') csrf = null
       const details: unknown = body?.error?.fields
       const fields = Array.isArray(details) ? details.flatMap((item) => {
         const field: unknown = item?.field
@@ -55,6 +75,7 @@ export async function request<T>(url: string, method = 'GET', data?: unknown, si
       }).filter(Boolean) : []
       throw new ApiError(response.status, body?.error?.code ?? 'HTTP_ERROR', [...new Set(fields)].slice(0, 5))
     }
+    if (url.startsWith('/auth/') && typeof body?.csrf_token === 'string') csrf = body.csrf_token
     return body as T
   } catch (error) {
     if (error instanceof ApiError || signal?.aborted) throw error

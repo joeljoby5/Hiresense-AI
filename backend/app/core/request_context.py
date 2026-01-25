@@ -28,6 +28,10 @@ class RequestContextMiddleware:
                 status = message["status"]
                 headers = [(k, v) for k, v in message.get("headers", []) if k.lower() != b"x-request-id"]
                 headers.append((b"x-request-id", request_id.encode("ascii")))
+                if not any(key == b"cache-control" for key, _ in headers):
+                    headers.append((b"cache-control", b"private, no-store"))
+                if not any(key == b"x-content-type-options" for key, _ in headers):
+                    headers.append((b"x-content-type-options", b"nosniff"))
                 message["headers"] = headers
             await send(message)
 
