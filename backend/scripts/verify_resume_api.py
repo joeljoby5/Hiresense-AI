@@ -14,6 +14,8 @@ import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from disposable import remove_test_database
+
 BACKEND = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND))
 
@@ -27,7 +29,8 @@ def verify():
     local = BACKEND / ".local"
     local.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="task003-http-", dir=local) as directory:
-        settings = Settings(_env_file=None, database_url="sqlite:///" + (Path(directory) / "verify.sqlite3").as_posix(),
+        database = Path(directory) / "verify.sqlite3"
+        settings = Settings(_env_file=None, database_url="sqlite:///" + database.as_posix(),
                             environment="development", development_identity_enabled=True, development_owner_id=None)
         migration = Config(str(BACKEND / "alembic.ini"))
         migration.attributes["settings"] = settings
@@ -119,6 +122,7 @@ def verify():
                 server.kill()
                 server.wait(timeout=5)
             gc.collect()
+            remove_test_database(database)
             print("Verification server stopped; disposable database cleanup follows.")
     print("PASS disposable database directory removed")
 
