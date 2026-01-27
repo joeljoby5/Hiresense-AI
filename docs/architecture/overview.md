@@ -22,7 +22,7 @@ flowchart LR
   Services -.-> Adapters[Document and optional AI provider adapters]
 ```
 
-Solid connections are implemented; dashed connections are plans. Browser presentation and HTTP transport are separated. The frontend currently uses only system health; resume workflows are available through the API/Swagger. The application factory accepts explicit settings, allowing tests to vary version, environment, namespace and allowed origins without mutating global configuration. The health route reports configuration only; it does not imply subsystem readiness.
+The browser workspace provides resume management, editing, exports, job listings and ATS analysis through their typed APIs. The application factory accepts explicit settings, allowing tests to vary environment, namespace and origins. Database readiness is checked separately from liveness.
 
 Resume workflow rules now live in application services, independent of React, HTTP routing, storage implementations and AI vendors. Future intelligence rules belong in application/domain code; add integrations when actual behavior requires them.
 
@@ -30,13 +30,13 @@ Resume workflow rules now live in application services, independent of React, HT
 
 Task 003 adds focused resume application services, an injected transaction boundary, a structural repository interface and typed owner-scoped REST workflows. Routes call services; services coordinate existing repositories and canonical validation. Local identity is explicitly initialized, disabled by default and prohibited outside development/loopback use. Metadata and content share atomic revision protection; checkpoints remain explicit. See [resume API architecture](resume-api.md) and [ADR 003](decisions/003-resume-services-api.md) for current boundaries and security restrictions.
 
-SQLite supports local development through synchronous SQLAlchemy 2.x, with explicit Alembic migrations. Only users, resumes and resume_versions exist. Canonical content is validated Pydantic schema-v1 JSON; ownership, draft revisions and snapshot numbering are relational. Repositories flush inside caller-owned transactions and expose no HTTP workflows. PostgreSQL can be considered later; it is untested and has no installed driver. See [persistence](persistence.md), [canonical schema](canonical-resume.md), and [ADR 002](decisions/002-resume-persistence.md).
+SQLite supports local development through synchronous SQLAlchemy 2.x and explicit Alembic migrations. Users, resumes, checkpoints, exports, jobs and analysis records are relational entities. Canonical content is validated Pydantic schema-v1 JSON. Repositories flush inside caller-owned transactions. See [persistence](persistence.md), [canonical schema](canonical-resume.md), [workspace architecture](workspace.md), and [analysis methodology](ats.md).
 
 ## Planned modules and integrations
 
-Foundational resume management and explicit checkpoints are implemented. Planned modules include advanced version restoration/comparison, document parsing/generation, deterministic ATS compatibility, job description intelligence, skill normalization/gaps, writing assistance, interview preparation, application tracking and career analytics. These remain objectives, not completed capabilities.
+Planned modules include advanced version restoration and comparison, document import, user corrections for extracted requirements, writing assistance, interview preparation, application tracking and career analytics.
 
-External AI should sit behind provider adapters, configurable for local or cloud inference when separately authorized. Deterministic ATS, resume management and document generation must work without generative AI. No AI provider, model, mock generation or external inference call exists now.
+Writing assistance uses a provider-neutral summary contract with disabled, deterministic mock and configured loopback providers. Deterministic ATS, resume management and exports work independently. Cloud inference, embedding implementations and real model quality evaluation remain open.
 
 ## Hardware, privacy and deployment
 

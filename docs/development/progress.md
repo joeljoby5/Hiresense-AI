@@ -1,5 +1,7 @@
 # Development progress
 
+This page records the Task 003 checkpoint. Current progress is tracked in the [master implementation tracker](master-implementation-progress.md).
+
 Updated: 2026-11-27 (Asia/Calcutta).
 
 ## Current milestone

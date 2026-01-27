@@ -4,7 +4,9 @@
 
 HireSense AI — AI-Powered Resume Builder, ATS Optimization and Career Intelligence Platform.
 
-The long-term goal is to help professionals create resumes, understand job descriptions, evaluate ATS compatibility and make informed career decisions. **Task 003 implements resume application services and REST APIs** on the React/FastAPI and canonical SQLite foundations: owner-scoped CRUD, independent copies, revision conflicts and explicit checkpoints. Development identity is disabled by default. Authentication, the editor, exports, ATS and AI remain deferred. This is a local development application.
+HireSense currently provides account-based workspaces, a resume library and structured editor, six live preview templates, revision-specific PDF/DOCX/TXT/JSON exports, a job workspace, and a deterministic resume analyzer. The analyzer shows separate readability and job compatibility estimates with source evidence and evaluation coverage. A labeled mock writing assistant works without any AI service. See the [implementation status](docs/development/master-implementation-progress.md).
+
+[Resume analyzer screenshot with synthetic data](docs/images/resume-analyzer.png)
 
 ## Stack and prerequisites
 
@@ -65,7 +67,7 @@ backend/.venv/Scripts/python.exe -m alembic -c backend/alembic.ini check
 
 Or from `backend/`, use `.venv/Scripts/python.exe -m alembic upgrade head`. Migrations create the configured SQLite parent directory; application startup never creates tables. Change `HIRESENSE_DATABASE_URL` in the backend environment for another database file. Quote absolute Windows SQLite URLs using forward slashes, e.g. `sqlite:///D:/private/hiresense.sqlite3`. Existing default data is not moved when configuration changes. Leave SQL logging disabled except for local debugging.
 
-`GET /api/v1/health` remains application liveness. `GET /api/v1/ready` returns 200 with `{"status":"ready"}` only after database connectivity, required tables/columns and the initial Alembic revision are verified; otherwise it returns a generic 503. It performs synchronous work in FastAPI's worker thread. Readiness may create an empty SQLite file if the parent directory exists, but never creates schema.
+`GET /api/v1/health` reports application liveness. `GET /api/v1/ready` verifies database connectivity, required schema objects and the current Alembic revision `0005_account_sessions`. It returns 503 until those requirements are met. Apply `upgrade head` to enable the new workspace features in an existing database.
 
 Tests run migrations against temporary file databases, including downgrade/re-upgrade and two-connection concurrent operations. They never downgrade the development database:
 
@@ -79,7 +81,7 @@ See [canonical schema](docs/architecture/canonical-resume.md), [persistence and 
 
 ## Local development identity and resume API
 
-Task 003 reuses migration `0001_resume_foundation`; no new migration is required. Initialize the database as above, then run from the repository root in PowerShell:
+Regular workspace use starts with registration in the browser. The optional development owner supports API testing without a session. Initialize or upgrade the database as above, then configure the local owner from the repository root in PowerShell if you need that mode.
 
 ```powershell
 $env:HIRESENSE_ENVIRONMENT='development'
@@ -150,6 +152,8 @@ npm.cmd run dev
 
 Open http://127.0.0.1:5173. API documentation: http://127.0.0.1:8000/docs; schema: http://127.0.0.1:8000/openapi.json; health: http://127.0.0.1:8000/api/v1/health.
 
+Create a local account using **Sign in** and **Create an account**. In **My resumes**, create a draft, open its editor, and wait for **Saved**. Use the history page to create a checkpoint or generate an export. In **Job workspace**, paste a description and review the extracted requirements. In **Resume analyzer**, choose a draft or checkpoint and an active saved job, then inspect the scores, weighted findings and evidence.
+
 Direct invocation of the virtual environment's Python avoids PowerShell activation restrictions. Do not change global execution policies. Stop development servers with Ctrl+C.
 
 Ports are strict; occupied ports produce an error rather than silently moving the frontend. Do not terminate unrelated processes. For alternatives, run the backend with `--port 8001`, set `API_PROXY_TARGET=http://127.0.0.1:8001` in `frontend/.env`, and use `npm.cmd run dev -- --port 5174`. If using a direct cross-origin backend URL, update `HIRESENSE_ALLOWED_ORIGINS` to the actual frontend origin.
@@ -161,6 +165,8 @@ From the root:
 ```powershell
 backend/.venv/Scripts/python.exe -m pytest backend/tests -c backend/pytest.ini
 backend/.venv/Scripts/python.exe -m pip check
+backend/.venv/Scripts/python.exe backend/scripts/generate_resume_schema.py --check
+backend/.venv/Scripts/python.exe backend/scripts/verify_workspace.py
 Set-Location frontend
 npm.cmd run typecheck
 npm.cmd run lint
@@ -171,24 +177,26 @@ If Windows denies pytest temporary-directory access, run in a terminal allowed t
 
 `npm.cmd run preview` serves the production build on loopback port 4173; the development API proxy is intentionally unavailable there. A future deployment needs a same-origin `/api` reverse proxy or a configured absolute API URL and explicit backend CORS origins.
 
-The connection check runs on mount and on retry, not continuously. Stop the backend and press **Check again** to verify the unavailable state, restart it and press **Retry connection** to reconnect. No version is shown until a valid response is received. Requests time out after five seconds; HTTP/network failures and invalid JSON/contracts have separate feedback. This health check confirms only that the API responds, not database or AI availability.
+The browser harness starts loopback Vite and Uvicorn against a disposable migrated database. It uses installed Microsoft Edge on Windows or Playwright Chromium on other platforms. Close a conflicting port 5184 or use a different test environment.
 
 ## Repository and architecture
 
 ```text
 frontend/                 React presentation and API client
   src/app/                Root composition
-  src/components/         Connection state presentation
-  src/pages/              Foundation screen
-  src/services/           Health request and response validation
+  src/features/           Resume library, editor, jobs and analyzer
+  src/services/           Shared workspace HTTP client and liveness client
+  e2e/                    Synthetic browser workflows
   src/styles/             Global styling and Tailwind design tokens
 backend/
   app/api/                Versioned HTTP routes
   app/core/               Centralized settings
   app/schemas/            Explicit request, response and error contracts
-  app/services/           Resume workflows and typed application results
+  app/services/           Resume, document, job and analysis workflows
   app/main.py             Application factory and initialization
   app/domain/resume/      Canonical Pydantic resume model (schema v1)
+  app/domain/intelligence/ Skill taxonomy, extraction, lexical scoring and ATS evidence
+  app/documents/          Semantic resume layout and document rendering
   app/database/           Engine, session, transaction and UTC conventions
   app/models/             Relational SQLAlchemy entities
   app/repositories/       Internal owner-scoped operations (no commits)
@@ -201,10 +209,12 @@ docs/development/         Milestone status and actual validation evidence
 AGENTS.md                 Durable development instructions
 ```
 
-The project is a modular monolith with separate browser presentation and REST API boundaries. Resume domain, data access and application workflow services are implemented; domain intelligence and AI adapters remain future work. See [architecture](docs/architecture/overview.md), [progress](docs/development/progress.md) and [implementation report](docs/development/task-001-report.md).
+The project is a modular monolith. The browser uses owner-scoped API contracts, and domain scoring and document formatting run independently of the UI. See [architecture](docs/architecture/overview.md), [workspace and document design](docs/architecture/workspace.md), [analysis methodology](docs/architecture/ats.md) and the [master specification](docs/MASTER_SPECIFICATION.md).
 
 ## Roadmap and limitations
 
-Next separately authorized milestone: Task 004, the professional frontend design system, application shell, navigation and resume library interface. The structured editor is Task 005. No frontend resume editor, dashboard, ATS, AI, imports, exports or authentication is implemented here.
+Regular accounts use password authentication and server-managed sessions. The optional developer identity owns separate local data. Public hosting still requires HTTPS configuration, production hardening and verification. Resume and job data are stored in unencrypted SQLite. The app retains the most recent 20 exports and 20 ATS analyses per owner. Deleting a resume removes its checkpoints, exports and linked analyses. Deleting a job removes its linked analyses. See [account security](docs/architecture/accounts.md).
 
-The application is not suitable for public deployment. Development identity provides one local configured owner without authentication. The database is not encrypted. SQLite serializes writers with a five-second timeout; short service write scopes reserve the writer before reads, and busy failures return a safe 503. Snapshots are immutable through supported application operations, while trusted direct SQL remains outside that boundary. PostgreSQL and browser rendering/accessibility are unverified. No Git commit, push or deployment was performed.
+Set `HIRESENSE_AI_PROVIDER=disabled` to turn off writing assistance. The default `mock` adapter only normalizes whitespace. The `ollama` and `openai-compatible` settings require `HIRESENSE_LOCAL_AI_ORIGIN` with a loopback IP and explicit port, plus `HIRESENSE_LOCAL_AI_MODEL` matching a locally configured model. The application sends only the selected saved summary with explicit consent. The adapters were verified with controlled HTTP responses. A separately installed runtime is needed to verify real inference.
+
+The browser preview uses estimated pagination. PDF font coverage is limited to the embedded Bitstream Vera fonts. Choose DOCX, TXT or JSON for text outside that coverage. ATS results are experimental, coverage-aware estimates. The rule-based extractor can miss qualifications or misread context. See the [progress tracker](docs/development/master-implementation-progress.md) for pending features and the next implementation action.
