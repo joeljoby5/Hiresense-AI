@@ -1,220 +1,205 @@
-# HireSense AI
+<h1 align="center">HireSense AI</h1>
 
-**Build Smarter. Apply Better. Grow Faster.**
+<p align="center"><strong>Build Smarter. Apply Better. Grow Faster.</strong></p>
 
-HireSense AI — AI-Powered Resume Builder, ATS Optimization and Career Intelligence Platform.
+<p align="center">Build a professional resume, see how it reads on the page, and find which job requirements your experience already supports.</p>
 
-HireSense currently provides account-based workspaces, a resume library and structured editor, six live preview templates, revision-specific PDF/DOCX/TXT/JSON exports, a job workspace, and a deterministic resume analyzer. The analyzer shows separate readability and job compatibility estimates with source evidence and evaluation coverage. A labeled mock writing assistant works without any AI service. See the [implementation status](docs/development/master-implementation-progress.md).
+<p align="center">
+  <img alt="React, TypeScript, FastAPI, and SQLite" src="docs/images/technology-badges.svg" width="315" height="24">
+</p>
 
-[Resume analyzer screenshot with synthetic data](docs/images/resume-analyzer.png)
+<p align="center">
+  <a href="#key-features">Features</a> ·
+  <a href="#intelligence-behind-hiresense-ai">Intelligence</a> ·
+  <a href="#application-showcase">Showcase</a> ·
+  <a href="#getting-started">Run locally</a>
+</p>
 
-## Stack and prerequisites
+![HireSense AI editor with structured resume fields and a live Modern Technical document preview](docs/images/resume-editor.png)
 
-- Windows PowerShell; Python 3.13 (validated on 3.13.7).
-- Node.js 22.12 or newer in the 22 series (validated on 22.16.0), npm (10.9.2 validated), Git.
-- React, TypeScript, Vite 8, Tailwind CSS 4; FastAPI, Pydantic settings, Uvicorn; SQLAlchemy 2.x/Alembic with built-in SQLite; Pytest/HTTPX.
-- Internet access for initial dependency installation. No paid keys, GPU, containers or external services required.
+*Edit a structured resume and watch the document update alongside it. All screenshots use fictional data in the running application.*
 
-Vite's supported runtime range is recorded in `frontend/package.json`. No global dependency installation is needed.
+## About HireSense AI
 
-## Setup on Windows
+HireSense AI is a local-first resume workspace for job seekers, from graduates building a first resume to experienced professionals preparing different versions for different roles. It keeps the resume, target job description, and feedback together so you can review what to improve before downloading a document.
 
-From the repository root:
+## The problem
+
+A resume has to present experience clearly, address a role’s requirements, and remain readable in the format you submit. Comparing several job descriptions by hand makes it easy to overlook qualifications or lose track of which draft you exported. HireSense AI connects each analysis and export to a saved revision so you can act on specific feedback and trace the document back to its source.
+
+## Key features
+
+### Structured resume builder and live templates
+
+Create a resume in **My resumes** and add experience, education, skills, projects, and custom sections. The editor autosaves, supports undo and redo, and lets you reorder or hide sections. Open **Presentation** to switch among six named single-column templates and adjust typography, margins, and page size. The live preview shows layout changes immediately with an estimated page count.
+
+![Presentation settings with the Professional Classic template and live resume preview](docs/images/resume-templates.png)
+
+*Switch templates while keeping your resume content in place.*
+
+### Job description workspace
+
+Paste a listing into **Job workspace** to keep its description, link, and notes together. Save it to review extracted requirements and their original phrases, then search or archive your listings as your targets change.
+
+![Saved platform engineering role with its job description and application research notes](docs/images/job-workspace.png)
+
+*The fictional Harborstone Labs listing supplies the requirements used in the analysis below.*
+
+### Explainable ATS scoring and skill matching
+
+In **Resume analyzer**, select a saved draft or checkpoint and an active job. Run the analysis to see separate **Document readability** and **Job compatibility** estimates with weighted findings and coverage. **Skill evidence** shows which requirements have support, where it appears in the resume, and which requirements need a closer look.
+
+![Calculated readability and job compatibility estimates with evaluation coverage and weighted findings](docs/images/ats-analyzer.png)
+
+*Coverage shows how much of each scoring rubric could be evaluated. A saved analysis retains the resume and job revisions it used.*
+
+![Skill evidence showing Python as a match for Python or Java, and Kubernetes and AWS as not evidenced](docs/images/skill-analysis.png)
+
+*Documented Python satisfies the Python-or-Java requirement. Kubernetes and AWS are flagged for review because the sample resume supplies no evidence for them.*
+
+### Writing suggestions with review
+
+On a saved professional summary, choose **Review summary suggestion** to compare the original and proposed text before applying or rejecting it. The default provider is labeled **Mock** and demonstrates the workflow by normalizing whitespace. Optional local model adapters use the same review flow.
+
+![Summary suggestion dialog labeled Mock suggestion, with original and proposed text and review controls](docs/images/ai-writing-assistant.png)
+
+*The labeled mock shows exactly what would change before you apply the proposal.*
+
+### Resume versions and document exports
+
+Duplicate a draft when you want a separate resume for a role. Use **Save checkpoint** in resume history to preserve a snapshot of the current draft with an optional change summary. Select the current saved draft or a checkpoint as the **Export source**, then generate a PDF, Word document, plain text file, or structured JSON.
+
+![Version history showing two checkpoints with change summaries and source draft numbers](docs/images/version-history.png)
+
+*Checkpoints preserve the resume at specific stages of editing.*
+
+![Export list with PDF, DOCX, TXT, and JSON generated from the same saved checkpoint](docs/images/document-export.png)
+
+*All four downloads come from Version 2, even though the current draft has advanced.*
+
+### Account-based workspaces
+
+Create a local account to keep resumes, jobs, analyses, and exports scoped to you. The **Account** screen supports profile edits, password changes, revoking other sessions, and deleting your account and its workspace data.
+
+<details>
+<summary>View account settings</summary>
+
+![Account workspace with profile editing, empty password fields, and session controls](docs/images/account-workspace.png)
+
+*Manage your local profile and revoke other sessions from one screen.*
+
+</details>
+
+## How HireSense AI works
+
+1. **Create or duplicate a resume.** Organize evidence from your experience, projects, and skills.
+2. **Choose a template.** Check the layout in the live preview and save a checkpoint when you want to preserve a draft.
+3. **Save a target job.** Paste the description and review how the workspace parsed its requirements.
+4. **Run an analysis.** Pick a resume revision and compare it with the saved job. Follow the evidence links back to relevant resume sections.
+5. **Revise and export.** Add accurate evidence where it helps, then generate a document from the draft or checkpoint you intend to send.
+
+## Intelligence behind HireSense AI
+
+- **Deterministic scoring and readability.** Versioned scoring rules evaluate layout settings, section headings, contact-field presence, and date completeness separately from job fit. The analyzer reports evaluation coverage and leaves file-level checks such as text extraction and reading order unknown.
+- **TF-IDF and cosine similarity.** A pairwise lexical comparison weights recognized skill terms across the resume and job description, then measures how closely the two skill profiles align. This signal contributes to compatibility alongside explicit matches and work or project evidence.
+- **Skill taxonomy and contextual extraction.** A versioned dictionary maps aliases such as Postgres to PostgreSQL, distinguishes Java from JavaScript, and uses wording and headings to recognize required, preferred, and alternative skills.
+- **Evidence-based feedback.** Findings connect back to source phrases and resume sections. A missing evidence flag points you to a requirement to verify. Assessments such as experience duration and credential equivalence need human review.
+- **Revision safety.** Optimistic concurrency checks prevent a stale tab from overwriting newer saved work. Structured checkpoints are immutable, and saved analyses record the exact source revisions.
+- **Configurable writing providers.** The deterministic analyzer runs independently of writing assistance. A separate provider interface supports disabled, mock, and optional loopback Ollama or OpenAI-compatible modes.
+
+[Read the ATS methodology](docs/architecture/ats.md) · [Explore the workspace architecture](docs/architecture/workspace.md)
+
+## Application showcase
+
+<details>
+<summary>Public landing page</summary>
+
+![HireSense AI landing page introducing drafts, checkpoints, and independent resume copies](docs/images/landing-page.png)
+
+*Start in the resume library or sign in to an existing workspace.*
+
+</details>
+
+<details open>
+<summary>Overview and resume library</summary>
+
+![Overview with a resume count and recently updated drafts](docs/images/dashboard.png)
+
+*The overview gives you a shortcut back to recent work.*
+
+![Resume library grid showing a source resume and two independent copies](docs/images/resume-library.png)
+
+*Search or sort drafts, then open history, export, rename, or duplicate a resume from its card.*
+
+</details>
+
+<details>
+<summary>Dark mode and mobile layout</summary>
+
+![Overview dashboard in dark mode](docs/images/dark-mode.png)
+
+*The workspace theme can be changed from the top bar.*
+
+![Mobile resume library with a navigation toggle, search, and stacked resume cards](docs/images/mobile-view.png)
+
+*On a narrow screen, navigation collapses into a menu and draft cards stack vertically.*
+
+</details>
+
+## Technology stack
+
+| Area | Technologies |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, Tailwind CSS, React Router, TanStack Query |
+| Backend | Python, FastAPI, Pydantic, Uvicorn |
+| Database | SQLite, SQLAlchemy, Alembic |
+| Intelligence | Python rules, versioned skill taxonomy, pairwise TF-IDF and cosine similarity |
+| Document processing | ReportLab, python-docx, plain text and JSON serializers |
+| Testing | pytest, HTTPX, pypdf extraction checks, Playwright with Edge on Windows |
+
+## Getting started
+
+Use **Windows PowerShell**, **Python 3.13**, and **Node.js 22.12+** in the 22 series with npm. From the repository root, install dependencies and apply the database migrations.
 
 ```powershell
 python -m venv backend/.venv
 backend/.venv/Scripts/python.exe -m pip install -r backend/requirements.txt
-Set-Location frontend
-npm.cmd ci
-Set-Location ..
-```
-
-Health/readiness configuration is optional. Resume operations additionally require explicit local identity setup below. To customize:
-
-```powershell
-Copy-Item backend/.env.example backend/.env
-Copy-Item frontend/.env.example frontend/.env
-```
-
-Backend settings are loaded from `backend/.env`, independent of the shell's working directory; process environment variables take precedence. Frontend configuration is loaded by Vite from `frontend/.env` and requires restarting Vite after changes. Examples are tracked; actual environment files are ignored. Only `VITE_` values are exposed to the browser: never place secrets there.
-
-| Setting | Default / purpose |
-| --- | --- |
-| `HIRESENSE_APP_NAME`, `HIRESENSE_APP_VERSION` | HireSense AI, 0.1.0 |
-| `HIRESENSE_ENVIRONMENT`, `HIRESENSE_DEBUG` | development, false |
-| `HIRESENSE_DATABASE_URL` | SQLite at `backend/.local/data/hiresense.sqlite3`; relative SQLite paths resolve from `backend/` |
-| `HIRESENSE_DATABASE_ECHO` | false; optional SQL statement logging with parameters hidden and result rows suppressed |
-| `HIRESENSE_DEVELOPMENT_IDENTITY_ENABLED` | false; explicitly opt in for local development only |
-| `HIRESENSE_DEVELOPMENT_OWNER_ID` | UUID printed by the explicit owner initialization command |
-| `HIRESENSE_API_PREFIX` | /api/v1; changing it requires matching `VITE_API_BASE_URL` |
-| `HIRESENSE_ALLOWED_ORIGINS` | JSON list of explicit frontend origins |
-| `VITE_API_BASE_URL` | /api/v1; may be an absolute backend URL |
-| `API_PROXY_TARGET` | http://127.0.0.1:8000; Vite server only |
-
-## Database foundation
-
-The domain document is independent of HTTP and SQLAlchemy. Relational `users`, `resumes` and `resume_versions` tables hold ownership, draft revisions and immutable snapshot metadata; validated JSON stores resume content. Application services expose owner-scoped resume workflows through typed REST routes. A service-owned transaction commits or rolls back all repository changes together. Identity has no HTTP endpoint.
-
-The default database is **`backend/.local/data/hiresense.sqlite3`**, resolved independently of your shell directory. Local data and SQLite sidecars are ignored by Git. SQLite is a built-in file database; no server installation is needed. Keep real resumes private and backed up appropriately: the local file is not encrypted by this application.
-
-After installing requirements, explicitly initialize or upgrade the database from the repository root:
-
-```powershell
 backend/.venv/Scripts/python.exe -m alembic -c backend/alembic.ini upgrade head
-backend/.venv/Scripts/python.exe -m alembic -c backend/alembic.ini current
-backend/.venv/Scripts/python.exe -m alembic -c backend/alembic.ini check
+npm.cmd --prefix frontend ci
 ```
 
-Or from `backend/`, use `.venv/Scripts/python.exe -m alembic upgrade head`. Migrations create the configured SQLite parent directory; application startup never creates tables. Change `HIRESENSE_DATABASE_URL` in the backend environment for another database file. Quote absolute Windows SQLite URLs using forward slashes, e.g. `sqlite:///D:/private/hiresense.sqlite3`. Existing default data is not moved when configuration changes. Leave SQL logging disabled except for local debugging.
-
-`GET /api/v1/health` reports application liveness. `GET /api/v1/ready` verifies database connectivity, required schema objects and the current Alembic revision `0005_account_sessions`. It returns 503 until those requirements are met. Apply `upgrade head` to enable the new workspace features in an existing database.
-
-Tests run migrations against temporary file databases, including downgrade/re-upgrade and two-connection concurrent operations. They never downgrade the development database:
+Start the API from the repository root.
 
 ```powershell
-backend/.venv/Scripts/python.exe -m pytest backend/tests -c backend/pytest.ini
-backend/.venv/Scripts/python.exe -m pytest backend/tests/test_persistence.py -c backend/pytest.ini
-backend/.venv/Scripts/python.exe -m pytest backend/tests/test_resume_domain.py -c backend/pytest.ini
+backend/.venv/Scripts/python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
-See [canonical schema](docs/architecture/canonical-resume.md), [persistence and ER diagram](docs/architecture/persistence.md), [decisions](docs/architecture/decisions/002-resume-persistence.md), and the [Task 002 report](docs/development/task-002-report.md).
-
-## Local development identity and resume API
-
-Regular workspace use starts with registration in the browser. The optional development owner supports API testing without a session. Initialize or upgrade the database as above, then configure the local owner from the repository root in PowerShell if you need that mode.
+From the repository root in a second terminal, start the frontend.
 
 ```powershell
-$env:HIRESENSE_ENVIRONMENT='development'
-$env:HIRESENSE_DEVELOPMENT_IDENTITY_ENABLED='true'
-Set-Location backend
-.venv/Scripts/python.exe -m app.initialize_owner
-# Copy the UUID printed by the command:
-$env:HIRESENSE_DEVELOPMENT_OWNER_ID='<printed UUID>'
-Set-Location ..
-backend/.venv/Scripts/python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000 --reload --no-access-log
+npm.cmd --prefix frontend run dev
 ```
 
-The initialization command is explicit and idempotent. It creates/reuses one synthetic internal development owner with no password, and rejects inactive or conflicting configured owners. To persist settings locally, put the same values in ignored `backend/.env`. Process variables are scoped to the current terminal and override that file.
+Open <http://127.0.0.1:5173>, select **Sign in**, then **Create an account**. The default local workflow needs no provider credentials. See [local setup and verification](docs/development/local-setup.md) for environment settings, alternate ports, and test commands.
 
-The resolver requires an explicitly enabled development environment, configured active owner and loopback connection. It does not trust Host or owner headers as identity. Missing/disabled/production identity returns 503, and ordinary requests never create accounts. Do not expose Vite, Uvicorn, a proxy or a tunnel publicly: this mode is not authentication. Health and readiness work without identity.
+## Current project status
 
-| Endpoint under `/api/v1` | Behavior |
-| --- | --- |
-| `POST /resumes` | Create title + optional content, 201 with Location |
-| `GET /resumes` | Metadata page; limit/offset/search/sort |
-| `GET /resumes/{id}` | Validated canonical detail |
-| `PATCH /resumes/{id}` | Title and/or complete content replacement, expected_revision required |
-| `DELETE /resumes/{id}?expected_revision=R` | Hard delete and cascade checkpoints, empty 204 |
-| `POST /resumes/{id}/duplicate` | Optional custom title, independent copy, 201 |
-| `POST /resumes/{id}/versions` | Explicit checkpoint at expected_revision, 201 |
-| `GET /resumes/{id}/versions` | Paginated checkpoint metadata |
-| `GET /resumes/{id}/versions/{version_id}` | Preserved canonical content |
+- **Working.** Local accounts, structured editing and templates, resume checkpoints, document exports, saved jobs, and deterministic ATS analysis.
+- **Mock.** The default summary provider demonstrates review and approval with deterministic spacing changes.
+- **Optional.** Loopback Ollama and OpenAI-compatible adapters have automated contract coverage with controlled responses. Live model inference remains unverified.
+- **Planned.** Resume import, checkpoint comparison and restoration, deeper tailoring and writing, cover letters, career recommendations, interview preparation, and application tracking.
 
-Try the complete lifecycle in `/docs`. New drafts start at revision 1. Title/content updates share one atomic revision and return 409 for stale state; null replacements are rejected. Copies preserve document entry IDs and source lineage, without copying history. Deleting a parent preserves independent children, clears their parent references and advances their revisions. Only the deleted resume's checkpoints cascade.
+[Implementation progress and known limits](docs/development/master-implementation-progress.md)
 
-Lists default to limit 20 (maximum 100), offset 0 (maximum 1,000,000), updated_desc; supported sorts also include updated_asc/title_asc/title_desc with UUID tie breaking. Search is a bounded literal title substring: %, _ and / are escaped; SQLite folds ASCII case only. Bodies are limited to 1 MiB, canonical collections to 200 items each, and existing narrower text limits remain. Oversized previously stored documents may need explicit correction; no data is rewritten.
+## Privacy and responsible AI
 
-Errors have stable `error.code`, safe message, server request ID and optional current revision/field categories. No input values or SQL details are returned. Logs use route templates without query/body data; X-Request-ID correlates requests. See [API architecture and examples](docs/architecture/resume-api.md), [ADR 003](docs/architecture/decisions/003-resume-services-api.md) and [Task 003 report](docs/development/task-003-report.md).
+Resume and job data stay in the configured local SQLite database by default. Account ownership and session checks scope access. The SQLite file is unencrypted. Resume editing, ATS analysis, and export run without a model. If a separate local writing runtime is configured, HireSense AI sends only the saved professional summary after explicit consent.
 
-For a synthetic manual request in a second terminal:
+Readability and compatibility scores are experimental estimates. Use their evidence and coverage to guide revision. Employer ATS behavior and hiring outcomes depend on factors outside the analysis.
 
-```powershell
-$base='http://127.0.0.1:8000/api/v1'
-$resume = Invoke-RestMethod -Method Post -Uri "$base/resumes" -ContentType 'application/json' -Body '{"title":"Synthetic manual draft"}'
-Invoke-RestMethod -Uri "$base/resumes/$($resume.id)"
-Invoke-RestMethod -Method Patch -Uri "$base/resumes/$($resume.id)" -ContentType 'application/json' -Body '{"expected_revision":1,"title":"Revised synthetic draft"}'
-Invoke-RestMethod -Method Post -Uri "$base/resumes/$($resume.id)/versions" -ContentType 'application/json' -Body '{"expected_revision":2,"change_summary":"Manual checkpoint"}'
-Invoke-RestMethod -Method Delete -Uri "$base/resumes/$($resume.id)?expected_revision=2"
-```
+## Technical documentation
 
-Delete only the synthetic resource created by those commands. For a fully isolated real HTTP lifecycle (including stale revisions, copying, checkpoints and cleanup), use:
-
-```powershell
-backend/.venv/Scripts/python.exe backend/scripts/verify_resume_api.py
-```
-
-That script migrates a disposable database under ignored backend/.local, bootstraps an owner, starts an owned loopback server on an available port, checks actual HTTP outcomes, stops the server and removes the database. It never uses the ordinary development database. It does not claim browser verification.
-
-## Run locally
-
-In PowerShell terminal 1, from the repository root:
-
-```powershell
-backend/.venv/Scripts/python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000 --reload --no-access-log
-```
-
-In terminal 2:
-
-```powershell
-Set-Location frontend
-npm.cmd run dev
-```
-
-Open http://127.0.0.1:5173. API documentation: http://127.0.0.1:8000/docs; schema: http://127.0.0.1:8000/openapi.json; health: http://127.0.0.1:8000/api/v1/health.
-
-Create a local account using **Sign in** and **Create an account**. In **My resumes**, create a draft, open its editor, and wait for **Saved**. Use the history page to create a checkpoint or generate an export. In **Job workspace**, paste a description and review the extracted requirements. In **Resume analyzer**, choose a draft or checkpoint and an active saved job, then inspect the scores, weighted findings and evidence.
-
-Direct invocation of the virtual environment's Python avoids PowerShell activation restrictions. Do not change global execution policies. Stop development servers with Ctrl+C.
-
-Ports are strict; occupied ports produce an error rather than silently moving the frontend. Do not terminate unrelated processes. For alternatives, run the backend with `--port 8001`, set `API_PROXY_TARGET=http://127.0.0.1:8001` in `frontend/.env`, and use `npm.cmd run dev -- --port 5174`. If using a direct cross-origin backend URL, update `HIRESENSE_ALLOWED_ORIGINS` to the actual frontend origin.
-
-## Verify
-
-From the root:
-
-```powershell
-backend/.venv/Scripts/python.exe -m pytest backend/tests -c backend/pytest.ini
-backend/.venv/Scripts/python.exe -m pip check
-backend/.venv/Scripts/python.exe backend/scripts/generate_resume_schema.py --check
-backend/.venv/Scripts/python.exe backend/scripts/verify_workspace.py
-Set-Location frontend
-npm.cmd run typecheck
-npm.cmd run lint
-npm.cmd run build
-```
-
-If Windows denies pytest temporary-directory access, run in a terminal allowed to manage temporary files. A workspace alternative is `--basetemp backend/.local/pytest-task003 -p no:cacheprovider`; use a dedicated disposable directory because pytest clears its base directory. The implementation environment required a scoped run outside its sandbox.
-
-`npm.cmd run preview` serves the production build on loopback port 4173; the development API proxy is intentionally unavailable there. A future deployment needs a same-origin `/api` reverse proxy or a configured absolute API URL and explicit backend CORS origins.
-
-The browser harness starts loopback Vite and Uvicorn against a disposable migrated database. It uses installed Microsoft Edge on Windows or Playwright Chromium on other platforms. Close a conflicting port 5184 or use a different test environment.
-
-## Repository and architecture
-
-```text
-frontend/                 React presentation and API client
-  src/app/                Root composition
-  src/features/           Resume library, editor, jobs and analyzer
-  src/services/           Shared workspace HTTP client and liveness client
-  e2e/                    Synthetic browser workflows
-  src/styles/             Global styling and Tailwind design tokens
-backend/
-  app/api/                Versioned HTTP routes
-  app/core/               Centralized settings
-  app/schemas/            Explicit request, response and error contracts
-  app/services/           Resume, document, job and analysis workflows
-  app/main.py             Application factory and initialization
-  app/domain/resume/      Canonical Pydantic resume model (schema v1)
-  app/domain/intelligence/ Skill taxonomy, extraction, lexical scoring and ATS evidence
-  app/documents/          Semantic resume layout and document rendering
-  app/database/           Engine, session, transaction and UTC conventions
-  app/models/             Relational SQLAlchemy entities
-  app/repositories/       Internal owner-scoped operations (no commits)
-  alembic/                Reviewed, explicit schema migrations
-  tests/                  Domain, database, migration, API and configuration tests
-  requirements.in         Direct dependency intent
-  requirements.txt        Exact resolved runtime/test dependency pins
-docs/architecture/        Implemented boundaries and future architecture
-docs/development/         Milestone status and actual validation evidence
-AGENTS.md                 Durable development instructions
-```
-
-The project is a modular monolith. The browser uses owner-scoped API contracts, and domain scoring and document formatting run independently of the UI. See [architecture](docs/architecture/overview.md), [workspace and document design](docs/architecture/workspace.md), [analysis methodology](docs/architecture/ats.md) and the [master specification](docs/MASTER_SPECIFICATION.md).
-
-## Roadmap and limitations
-
-Regular accounts use password authentication and server-managed sessions. The optional developer identity owns separate local data. Public hosting still requires HTTPS configuration, production hardening and verification. Resume and job data are stored in unencrypted SQLite. The app retains the most recent 20 exports and 20 ATS analyses per owner. Deleting a resume removes its checkpoints, exports and linked analyses. Deleting a job removes its linked analyses. See [account security](docs/architecture/accounts.md).
-
-Set `HIRESENSE_AI_PROVIDER=disabled` to turn off writing assistance. The default `mock` adapter only normalizes whitespace. The `ollama` and `openai-compatible` settings require `HIRESENSE_LOCAL_AI_ORIGIN` with a loopback IP and explicit port, plus `HIRESENSE_LOCAL_AI_MODEL` matching a locally configured model. The application sends only the selected saved summary with explicit consent. The adapters were verified with controlled HTTP responses. A separately installed runtime is needed to verify real inference.
-
-The browser preview uses estimated pagination. PDF font coverage is limited to the embedded Bitstream Vera fonts. Choose DOCX, TXT or JSON for text outside that coverage. ATS results are experimental, coverage-aware estimates. The rule-based extractor can miss qualifications or misread context. See the [progress tracker](docs/development/master-implementation-progress.md) for pending features and the next implementation action.
+- [Architecture overview](docs/architecture/overview.md) · [Workspace and document design](docs/architecture/workspace.md)
+- [Resume API](docs/architecture/resume-api.md) · [Canonical resume schema](docs/architecture/canonical-resume.md) · [Persistence](docs/architecture/persistence.md)
+- [ATS methodology](docs/architecture/ats.md) · [Account and session security](docs/architecture/accounts.md)
+- [Setup and testing](docs/development/local-setup.md) · [Master implementation report](docs/development/master-implementation-report.md) · [Progress tracker](docs/development/master-implementation-progress.md)

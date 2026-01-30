@@ -177,7 +177,7 @@ Set-Location ..
 backend/.venv/Scripts/python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000 --reload --no-access-log
 ```
 
-Use http://127.0.0.1:8000/docs or the synthetic HTTP examples in README. For independent verification:
+Use http://127.0.0.1:8000/docs or the synthetic examples in the [resume API guide](../architecture/resume-api.md). For independent verification:
 
 ```powershell
 backend/.venv/Scripts/python.exe -m pytest backend/tests -c backend/pytest.ini --basetemp backend/.local/task003-release -p no:cacheprovider --tb=short

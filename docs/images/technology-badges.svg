@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="315" height="24" viewBox="0 0 315 24" role="img" aria-labelledby="title">
+  <title id="title">React, TypeScript, FastAPI, and SQLite</title>
+  <rect width="62" height="24" rx="4" fill="#17324d"/>
+  <rect x="70" width="91" height="24" rx="4" fill="#235a97"/>
+  <rect x="169" width="73" height="24" rx="4" fill="#146c65"/>
+  <rect x="250" width="65" height="24" rx="4" fill="#214761"/>
+  <g fill="#fff" font-family="system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">
+    <text x="31" y="16">React</text>
+    <text x="115.5" y="16">TypeScript</text>
+    <text x="205.5" y="16">FastAPI</text>
+    <text x="282.5" y="16">SQLite</text>
+  </g>
+</svg>

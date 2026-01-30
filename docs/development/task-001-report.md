@@ -124,7 +124,7 @@ Set-Location 'D:\PROJECTS\Hiresense AI\frontend'
 npm.cmd run dev
 ```
 
-Open http://127.0.0.1:5173 and http://127.0.0.1:8000/docs. Dependency reinstall and all check commands are in the root README. Virtualenv activation is unnecessary.
+Open http://127.0.0.1:5173 and http://127.0.0.1:8000/docs. See the [quickstart](../../README.md#getting-started) for dependencies and the [local setup guide](local-setup.md#verification) for verification commands. Virtualenv activation is unnecessary.
 
 ## 15–16. Handoff
 
